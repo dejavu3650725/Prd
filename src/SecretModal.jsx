@@ -20,8 +20,13 @@ function SecretModal({ isOpen, onClose, allStudents, secretQueue, setSecretQueue
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-btn" onClick={onClose}>&times;</button>
-        <h2>🤫 비밀 설정</h2>
+        <button className="close-btn" onClick={onClose}>
+          <span className="material-symbols-outlined">close</span>
+        </button>
+        <h2>
+          <span className="material-symbols-outlined">visibility_off</span>
+          비밀 설정
+        </h2>
         <p>다음에 무조건 당첨될 학생을 미리 지정합니다.</p>
 
         <div className="secret-controls">
@@ -45,7 +50,9 @@ function SecretModal({ isOpen, onClose, allStudents, secretQueue, setSecretQueue
             secretQueue.map((student, index) => (
               <div key={index} className="queue-item">
                 <span>{index + 1}. {student}</span>
-                <button onClick={() => handleRemoveSecret(index)}>취소</button>
+                <button onClick={() => handleRemoveSecret(index)}>
+                  <span className="material-symbols-outlined">remove_circle_outline</span>
+                </button>
               </div>
             ))
           )}

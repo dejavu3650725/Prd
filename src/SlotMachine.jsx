@@ -54,7 +54,7 @@ function SlotMachine({ isDrawing, selectedStudents, allStudents, onDraw }) {
         <div className="lights">
           <span></span><span></span><span></span><span></span><span></span>
         </div>
-        <h2>🎰 럭키 드로우 🎰</h2>
+        <h2>럭키 드로우</h2>
       </div>
 
       <div className="slots-area">
@@ -73,6 +73,7 @@ function SlotMachine({ isDrawing, selectedStudents, allStudents, onDraw }) {
         onClick={onDraw} 
         disabled={isDrawing || allStudents.length === 0}
       >
+        <span className="material-symbols-outlined">play_circle</span>
         {isDrawing ? '뽑는 중...' : '발표자 뽑기!'}
       </button>
     </div>

@@ -3,6 +3,7 @@ import './App.css';
 import StudentListManager from './StudentListManager';
 import SlotMachine from './SlotMachine';
 import SecretModal from './SecretModal';
+import StudentGraph from './StudentGraph';
 
 function App() {
   // 상태 관리 (localStorage 초기화 연동)
@@ -109,7 +110,10 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>✨ 랜덤 발표자 뽑기 ✨</h1>
+      <h1>
+        <span className="material-symbols-outlined" style={{ fontSize: '1.2em' }}>school</span>
+        랜덤 발표자 뽑기
+      </h1>
       
       <div className="top-controls">
         <label>뽑을 인원 수:</label>
@@ -122,6 +126,8 @@ function App() {
         />
         <label>명</label>
       </div>
+
+      <StudentGraph students={students} selectedStudents={selectedStudents} />
 
       <div className="main-content">
         <SlotMachine 

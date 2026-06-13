@@ -30,7 +30,10 @@ function StudentListManager({ students, setStudents }) {
 
   return (
     <div className="student-manager">
-      <h2>🧑‍🎓 학생 명단 관리</h2>
+      <h2>
+        <span className="material-symbols-outlined">group</span>
+        학생 명단 관리
+      </h2>
       
       <div className="input-group">
         <textarea 
@@ -39,13 +42,18 @@ function StudentListManager({ students, setStudents }) {
           onChange={(e) => setInputText(e.target.value)}
           rows="3"
         />
-        <button onClick={handleAdd} className="add-btn">추가하기</button>
+        <button onClick={handleAdd} className="add-btn">
+          <span className="material-symbols-outlined">person_add</span>
+          추가하기
+        </button>
       </div>
 
       <div className="list-header">
         <span>총 {students.length}명</span>
         {students.length > 0 && (
-          <button onClick={handleClearAll} className="clear-btn">전체 삭제</button>
+          <button onClick={handleClearAll} className="clear-btn">
+            전체 삭제
+          </button>
         )}
       </div>
 
@@ -56,7 +64,9 @@ function StudentListManager({ students, setStudents }) {
           students.map((student, index) => (
             <div key={index} className="student-item">
               <span>{student}</span>
-              <button onClick={() => handleRemove(index)} className="remove-btn">✕</button>
+              <button onClick={() => handleRemove(index)} className="remove-btn">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
           ))
         )}
