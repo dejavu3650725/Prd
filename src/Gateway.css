@@ -1,0 +1,155 @@
+.gateway-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 20px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+.gateway-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 650px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.gateway-card h1 {
+  text-align: center;
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.guidelines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* 스크롤바 스타일링 */
+.guidelines-list::-webkit-scrollbar {
+  width: 8px;
+}
+.guidelines-list::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px;
+}
+.guidelines-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1; 
+  border-radius: 10px;
+}
+.guidelines-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8; 
+}
+
+.guideline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+  border-left: 5px solid #4facfe;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.guideline-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.guideline-badge {
+  background: #4facfe;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.guideline-content h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.guideline-content p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.agreement-section {
+  background: #e9ecef;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  transition: background 0.3s;
+}
+
+.agreement-section:hover {
+  background: #e2e6ea;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  gap: 12px;
+  font-size: 1.05rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  accent-color: #4facfe;
+}
+
+.start-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.start-btn.disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.start-btn.active {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+}
+
+.start-btn.active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+}

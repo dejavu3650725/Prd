@@ -4,8 +4,12 @@ import StudentListManager from './StudentListManager';
 import SlotMachine from './SlotMachine';
 import SecretModal from './SecretModal';
 import StudentGraph from './StudentGraph';
+import Gateway from './Gateway';
+import Footer from './Footer';
 
 function App() {
+  const [isGatewayPassed, setIsGatewayPassed] = useState(false);
+
   // 상태 관리 (localStorage 초기화 연동)
   const [students, setStudents] = useState(() => {
     const saved = localStorage.getItem('randomPresenter_students');
@@ -108,6 +112,10 @@ function App() {
     }, 3000); // 3초간 슬롯머신 돌아감
   };
 
+  if (!isGatewayPassed) {
+    return <Gateway onPass={() => setIsGatewayPassed(true)} />;
+  }
+
   return (
     <div className="app-container">
       <h1>
@@ -157,6 +165,8 @@ function App() {
         secretQueue={secretQueue}
         setSecretQueue={setSecretQueue}
       />
+      
+      <Footer />
     </div>
   );
 }
