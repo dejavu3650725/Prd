@@ -1,0 +1,826 @@
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"] {
+    overflow : hidden ;
+    height   : 100%   ;
+    width    : 100%   ;
+    margin-left  : 0px ;
+    margin-right : 0px ;
+    background-color : #F1F1F1 ;
+    --media-layout : desktop ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-pageheader-project {
+    background-color : #011429 ;
+    padding : 0.2rem 1rem ;
+    height  : 2.95rem ;
+    background-image    : url('/bid_front/cwinfo.wowideas/unit/images/layout/prjlayout-topright-bg.png') ;
+    background-repeat   : no-repeat ;
+    background-position : right bottom ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-contents-cover {
+    position : absolute ;
+    top      : 2.95rem  ;
+    left     : 250px    ;
+    right    : 0px      ;
+    bottom   : 0px      ;
+    overflow : hidden   ;
+}
+
+/*-- DeskTop : Left Menu --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full {
+    display  : block  ;
+    position : fixed  ;
+    top      : 0px    ;
+    left     : 0px    ;
+    width    : 250px  ;
+    bottom   : 0px    ;
+    background-color : #011429 ;
+    overflow : auto   ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-mini {
+    display  : none   ;
+    position : fixed  ;
+    top      : 0px    ;
+    left     : 0px    ;
+    width    : 90px   ;
+    bottom   : 0px    ;
+    background-color : #011429 ;
+    overflow : auto   ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid_view_overlay="offcanvas"]  {
+    display  : none  ;
+    position : fixed ;
+    left     : 0px  ;
+    top      : 0px  ;
+    right    : 0px  ;
+    bottom   : 0px  ;
+    z-index  : 1040 ;
+    background-color : rgba(0, 0, 0, 0.5) ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-header {
+    height   : 2.95rem ;
+    color    : white ;
+}
+
+/*-- DeskTop : Left Menu Toogle is Mini --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+.bid-leftmenu-full {
+    display  : none   ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+.bid-leftmenu-mini {
+    display  : block   ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+.bid-contents-cover {
+    left : 90px  ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+[bid_view_overlay="offcanvas"]  {
+    display : none ;
+}
+
+/*-- Left Project Logo Element--*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-bgimage-leftmenu-logo {
+    height :145px ;
+    background-repeat : no-repeat ;
+    background-attachment :scroll;
+    background-position :center center;
+    background-size : cover ;
+    position : relative ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-bgimage-leftmenu-logo-cover {
+    background-position :center center;
+    position : absolute ;
+    top    : 0px ;
+    bottom : 0px ;
+    left   : 0px ;
+    right  : 0px ;
+    background-color: rgba( 0, 0, 0, 0.5 );
+}
+
+/*-- Mobile Layout --*/
+@media (max-width: 991px) {
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"] {
+        --media-layout : mobile ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-contents-cover {
+        left     : 0px  ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-leftmenu-full {
+        display  : none   ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-leftmenu-mini {
+        display  : none   ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    [bid_view_overlay="offcanvas"]  {
+        display : none ;
+    }
+    /*-- DeskTop : Left Menu Toogle is Mini --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-leftmenu-full {
+        display : block ;
+        z-index : 2411  ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-leftmenu-mini {
+        display : none  ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    [bid_view_overlay="offcanvas"]  {
+        display : block ;
+    }
+
+}
+
+
+/*-- 회원초대 Sector에 대한 CSS --*/
+@keyframes blink-effect {
+    from {
+        outline : 7px solid transparent ;
+    }
+    to {
+        outline : 7px solid rgba(129,255,218,0.2) ;
+    }
+
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-sector-invite-btn {
+    width   : 4rem ;
+    height  : 4rem ;
+    border-radius: 50% ;
+    display : flex ;
+    justify-content: center ;
+    align-items: center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-sector-invite-btn.bid-pulse {
+    color : #C7FFF0 ;
+    background-color : rgba(129,255,218,0.35) ;
+    animation-name : blink-effect ;
+    animation-duration : 1s ;
+    animation-iteration-count : infinite ;
+    animation-direction: alternate;
+
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-sector-invite-btn:hover {
+    color : #C7FFF0 ;
+    background-color : rgba(129,255,218,0.35) ;
+    animation-name : blink-effect ;
+    animation-duration : 1s ;
+}
+
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid-btn-callmodal='invite'] {
+    font-size : 2.5rem ;
+    cursor : pointer ;
+    line-height : 1  ;
+}
+
+@media (max-width: 600px) {
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    [bid-btn-callmodal='invite'] {
+        font-size : 2.0rem ;
+        cursor : pointer ;
+    }
+}
+
+/*-- Badge Icon --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid-icon-badge] {
+    position:relative
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid-icon-badge]:after {
+    background: red ;
+    border-radius: 30px;
+    color: #fff;
+    content: attr(bid-icon-badge);
+    font-size: 9px;
+    font-weight: normal;
+    top: -0.3rem;
+    right: -7px;
+    min-width: 15px;
+    padding: 1px 4px;
+    position: absolute;
+    text-align: center;
+    line-height: 13px
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid-icon-badge="0"]:after,
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+[bid-icon-badge=""]:after {
+    display: none;
+}
+
+/*-- Left WorkSpace Button --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-btn-left-ctlspace {
+    display : inline-block ;
+    letter-spacing:0rem;
+    border-radius:15px;
+    text-align:center;
+    padding:2px 7px;
+    font-size:14px;
+    font-family:'Noto Sans KR',sans-serif;
+
+    border: 2px solid #BFBEBE ;
+    font-weight : normal ;
+    cursor : pointer ;
+    background-color:#02142A;
+    color:#BFBEBE;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-btn-left-ctlspace:hover {
+    border: 2px solid #B4FFE9 ;
+    background-color : #B4FFE9 ;
+    color : #011429 ;
+}
+
+/*-- DeskTop Layout --*/
+@media (min-width: 992px) {
+    /*-- OverLay --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    [bid_view_overlay="offcanvas"] {
+        display:none ;
+    }
+
+    /*-- LeftMenu Layout --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop {
+        left  : 0px ;
+        width : 250px
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop .bid-leftmenu-mini{
+        display : none ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop .bid-leftmenu-full{
+        display : block ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle {
+        margin-left  : 91px ;
+    }
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-section-leftmenu-desktop {
+        width : 91px
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-section-leftmenu-desktop .bid-leftmenu-mini{
+        display : block ;
+    }
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-section-leftmenu-desktop .bid-leftmenu-full{
+        display : none  ;
+    }
+
+    /*-- Right Chatt --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-rightchat-desktop {
+        width : 250px  ;
+        right : -250px
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].rightchat {
+        margin-right  : 250px ;
+    }
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].rightchat
+    .bid-section-rightchat-desktop {
+        right : 0px
+    }
+}
+
+
+
+
+
+
+
+/*-- Mobile Layout --*/
+@media (max-width: 991px) {
+    /*-- Left Project Logo Element--*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-bgimage-leftmenu-logo {
+        height :145px ;
+        background-repeat : no-repeat ;
+        background-attachment :scroll;
+        background-position :center center;
+        background-size : cover ;
+        position : relative ;
+        font-family:NanumSquare,sans-serif;
+        opacity  : 0.7 ;
+    }
+
+    /*-- LeftMenu Layout --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-sm-none {
+        display : none ;
+    }
+
+    /*-- LeftMenu Layout --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop {
+        width : 300px ;
+        left  : -300px ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop .bid-leftmenu-mini{
+        display : none ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-leftmenu-desktop .bid-leftmenu-full{
+        display : block ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].leftmenu-toggle
+    .bid-section-leftmenu-desktop {
+        left  : 0px ;
+        z-index : 1045 ;
+    }
+
+    /*-- Right Chatt --*/
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-section-rightchat-desktop {
+        width : 300px  ;
+        right : -300px
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"].rightchat
+    .bid-section-rightchat-desktop {
+        right   : 0px ;
+        width   : 85vw ;
+        max-width : 350px ;
+        z-index : 1045 ;
+    }
+}
+
+/*-- Left Menu DeskTop Full Tabs --*/
+
+.bid-leftmenu-nav-tabs .nav-item .nav-link {
+    box-shadow: 0px -1px #808080 inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #808080 ;
+}
+
+.bid-leftmenu-nav-tabs .nav-item .nav-link.active {
+    box-shadow  : 0px -4px #CBCBCB inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #CBCBCB ;
+}
+
+/*-- Left Menu List WorkSpace --*/
+.bid-section-leftmenu-full-listspace {
+    padding-left : 0.751rem
+}
+
+.bid-section-leftmenu-full-listspace .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+}
+
+.bid-section-leftmenu-full-listspace .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Left Menu List WorkSystem --*/
+.bid-section-leftmenu-full-listsystem {
+    padding-left : 0.751rem
+}
+
+.bid-section-leftmenu-full-listsystem .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+}
+
+.bid-section-leftmenu-full-listsystem .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Left Menu DeskTop Mini Tabs --
+--*/
+.bid-leftmenu-mini .bid-leftmenu-tabs {
+    box-shadow: 0px -1px #808080 inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #808080 ;
+    padding: .5rem 1rem ;
+    text-align : center ;
+}
+
+.bid-section-leftmenu-mini-listspace {
+    padding-left : 1.25rem ;
+}
+
+.bid-section-leftmenu-mini-listspace .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+    text-align : left ;
+}
+
+.bid-section-leftmenu-mini-listspace .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Right Menu Chatting  --
+--*/
+.split, .gutter.gutter-horizontal {
+    float: left ;
+    height: 100% ;
+}
+
+.gutter {
+    background-color: gray ;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+.gutter.gutter-horizontal {
+    cursor : ew-resize ;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}
+
+
+
+/*-- Image Logo & Contents --
+    Header : .bid-background-image-logo
+--*/
+
+[bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-background-image-logo .bid-background-image-logo-cover {
+    background-position : center center ;
+    position : absolute ;
+    bottom   : 0px ;
+    padding  : 0rem 3rem 30px 3rem ;
+    left     : 0px ;
+    right    : 0px ;
+    background : rgb(2,0,36) ;
+    background : linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(44,45,45,0.59) 60%, rgba(249,249,249,0) 100%) ;
+
+    .bid-badge-orgtype {
+        display : inline-block ;
+        text-align : center ;
+        font-size  : 1.3rem ;
+        font-weight : 500 ;
+        min-width   : 68px ;
+        padding : 6px 4px ;
+        border  : 2px solid transparent ;
+        border-radius: 0.5rem ;
+    }
+    .bid-badge-orgtype.bid-badge-orgtype-pro {
+        border  : 2px solid #EF01A9  ;
+        background-color : #EF01A960 ;
+        color : white ;
+    }
+    .bid-badge-orgtype.bid-badge-orgtype-lte {
+        border  : 2px solid #F2B001  ;
+        background-color : #F2B00150 ;
+        color : white ;
+    }
+    .bid-badge-orgtype.bid-badge-orgtype-org {
+        border  : 2px solid #9102F1  ;
+        background-color : #9102F190 ;
+        color : white ;
+    }
+    .bid-badge-orgtype.bid-badge-orgtype-bas {
+        border  : 2px solid #4CD8BD  ;
+        background-color : #4CD8BD80 ;
+        color : white  ;
+        min-width : 90px ;
+    }
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-background-image-logo [data-bid-element='title_def'] {
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    font-size   : 2.5rem ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-background-image-logo [data-bid-element='cntitem'],[data-bid-element='acc_hit'] {
+    font-family : Segoe UI,sans-serif ;
+    font-weight : bold ;
+    font-size   : 1.7rem ;
+    color : #FFFFFF
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-background-image-logo [data-bid-element='url_mgricon'] {
+    width  : 48px ;
+    height : 48px ;
+    border : 1px solid #dee2e6 ;
+    margin-right : 8px ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-background-image-logo [data-bid-element='mgr_name'] {
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.3rem ;
+    color : #DFDFDF ;
+}
+
+/*-- DeskTop Left List member --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-callblock-itemmem {
+    cursor : pointer ;
+}
+
+
+@media (max-width: 600px) {
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-background-image-logo .bid-background-image-logo-cover {
+        padding : 0 1.3rem 15px 1.3rem;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-background-image-logo [data-bid-element='title_def'] {
+        font-family : NanumSquare,sans-serif ;
+        font-weight : bold ;
+        font-size   : 1.6rem ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-background-image-logo [data-bid-element='cntitem'],[data-bid-element='acc_hit'] {
+        font-family : Segoe UI,sans-serif ;
+        font-weight : bold ;
+        font-size   : 1.5rem ;
+        color : #FFFFFF
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-background-image-logo [data-bid-element='url_mgricon'] {
+        width  : 40px ;
+        height : 40px ;
+        border : 1px solid #dee2e6 ;
+        margin-right : 4px ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+    .bid-background-image-logo [data-bid-element='mgr_name'] {
+        font-size   : 1.2rem ;
+    }
+}
+
+/*-- New CSS Left Menu Accordian --
+*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navbar-space-leftmenu {
+    border : 0px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navbar-space-leftmenu {
+    border : 0px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu {
+    border : 0px ;
+    padding : 0rem ;
+    background-color : transparent ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-header {
+    border : 0px ;
+    background-color : transparent ;
+    font-family : NanumSquare,sans-serif ;
+    font-size : 1.05rem ;
+    color : #808080 ;
+    line-height : 1.05 ;
+    padding : 0rem 0rem 0.2rem 0.5rem ;
+    display : flex ;
+    align-items : center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='false'] .bid-folder-open, .bid-folder-close {
+    display : none ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='true'] .bid-folder-open {
+    display : inline-block ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='true'] .bid-folder-close {
+    display : none ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='false'] .bid-folder-open {
+    display : none ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='false'] .bid-folder-close {
+    display : inline-block ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-handle {
+    width     : 18px ;
+    flex-grow : 0  ;
+    font-size : 0.8rem ;
+    align-items : center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navbar-subspace {
+    padding-left : 1.25rem ;
+    background-color: transparent ;
+}
+
+/*-- NavBar Space Info --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-spaceinfo {
+    flex-grow : 1  ;
+    display   : flex ;
+    align-items : center ;
+    border-top-left-radius    : 20px ;
+    border-bottom-left-radius : 20px ;
+    padding : 8px 0px 8px 0px ;
+
+    background-color : transparent ;
+    color   : #808080 ;
+    font-weight: normal ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-spaceinfo.active {
+    background-color: #F1F1F1 ;
+    color : #011429 ;
+    font-weight: bold ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='ws_icontag'] {
+    flex-grow   : 0  ;
+    line-height : 1  ;
+    align-self  : center ;
+    padding-left  : 7px  ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='title_def'] {
+    flex-grow   : 1  ;
+    line-height : 1  ;
+    align-self  : center ;
+    padding-left  : 7px ;
+    padding-right : 5px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-leftmenu-full .bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='cntitem'] {
+    flex-grow : 0  ;
+    align-self  : center ;
+    padding-right : 10px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-btn-rightmodule .bid-cover-btnicon {
+    line-height : 1 ;
+    cursor  : pointer ;
+    display : flex ;
+    justify-content : center ;
+    align-items : center ;
+    cursor : pointer ;
+    width  : 46px ;
+    height : 46px ;
+    font-size : 20px ;
+    border-radius : 50% ;
+    border : 1px solid #b8bbbb;
+    background-color : #e1e1e1;
+    color : #1a3a3a ;
+    box-shadow : rgb(0 0 0 / 35%) 0px 2px 5px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-bgimage-leftmenu-goto-mypage {
+    /*-- Location --*/
+    margin-top  :10px ;
+    margin-left :15px ;
+
+    /*-- Color --*/
+    background-color : rgba(24,39,55,0.6) ;
+    filter : drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161)) ;
+    color  : rgb(191,190,190) ;
+    border : 2px solid rgb(191,190,190) ;
+
+    /*-- Display --*/
+    display : flex ;
+    justify-content : center ;
+    align-items : center ;
+
+    /*-- Font --*/
+    font-size   : 1rem ;
+    line-height : 1 ;
+    font-weight : bold ;
+
+    /*-- Shape --*/
+    width  : 100px ;
+    height : 2.2rem ;
+    cursor : pointer ;
+
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:block.prjintro"]
+.bid-bgimage-leftmenu-goto-mypage:hover {
+    /*-- Color --*/
+    color  : rgb(180,255,233) ;
+    border : 2px solid rgb(180,255,233) ;
+}
+
+
+
+/*-- ListMembers(멤버리스트) 영역 --*/
+@media all {
+    [data-bid-module='class:cwinfo.wowideas:bs4.prjmain:block.prjintro']
+    .bid-listmembers-btn-head {
+        display: inline-block;
+        letter-spacing: 0rem;
+        border-radius: 15px;
+        text-align: center;
+        padding: 2px 7px;
+        font-size   : 14px ;
+        font-family : 'Noto Sans KR',sans-serif ;
+        font-weight : 500  ;
+        cursor : pointer ;
+        margin-left : 3px ;
+        border: 2px solid #808080 ;
+        background-color: #FFFFFF ;
+        color: #808080 ;
+    }
+    [data-bid-module='class:cwinfo.wowideas:bs4.prjmain:block.prjintro']
+    .bid-listmembers-btn-head:hover {
+        border: 2px solid #011429 ;
+        background-color: #81FFDA ;
+        color: #011429 ;
+    }
+}
+

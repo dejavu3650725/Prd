@@ -1,0 +1,1953 @@
+if( window.console == undefined ){ console = { log : () => {} }; }
+
+// -- bidengine Paramter : 7 개 --
+var bidengine  = {
+    "version"  : 1.39 ,    // BID version
+    "buildday" : 2026062602 ,  // BID 디렉토리가 Build 된 일자 "YYYYMMDD" + 일련번호 2자리
+    "configs"  : [] ,      // Array of Page BID Config (초기 컨피그 설정)
+    "objects"  : [] ,      // Array of Page BID Object (초기 오브젝트 설정)
+    "sockets"  : {} ,      // JSON  of Socket.io Connect Socket
+    "globals"  : {} ,      // JSON  of Global Data
+    "libs"     : {} ,      // JSON  of BID Component Extend Function Library
+    "sethashtag" : false   // true : URL hash Tag만 변하지 Action 은 일어나지 않는다. 이는 한번뿐이다.
+} ;
+
+var bidclass   = {} ;   // BID 컴퍼넌트 Class
+var bidobject  = {} ;   // BID Object Instance of Class
+var bidlibrary = {} ;   // BID Component Extend Function Library
+var bidhtml    = {} ;   // JSON of BID Component Extend Html Tag
+var bidscript  = [] ;   // BID 엔진으로 올린 Javascript File
+var biderror   = {} ;   // BID Global Error
+var bidobserver = new ResizeObserver ( aListEntries => {
+    let sBidObject ;
+    for (let oEntry of aListEntries) {
+        // const {width, height} = oEntry.contentRect;
+        sBidObject = oEntry.target.getAttribute('bid-object') ;
+        if(window.bidobject[sBidObject]) {
+            if(window.bidobject[sBidObject].fnBidObserver)
+                window.bidobject[sBidObject].fnBidObserver( oEntry ) ;
+        }
+    }
+}) ;
+/* -- 1. bidengine Core Library : 5 개 --
+1.1. bidengine.setengine ( fcSetEngine )  : Bid Configuration 을 이용한 Engine 설정
+1.2. bidengine.startengine (fcStartEngine) : Bid Engine 시작
+1.3. bidengine.initobject () : bidengine.objects[] Array 를 이용한 Hash Tag 설정
+1.4. bidengine.callmodule (oTarget, sCmd, jParam, fnCallback) : 실제 Object Module 실행 -> fnCallObject 로 대처
+    oTarget : jQuery Selector
+    sCmd : Module Method
+    jParam : Module Parameter
+    fnCallback( jError, oTarget )
+    -- Default Parameter : 5 --
+    1) bid_object     : Option
+    2) bid_method     :
+    3) bid_module     : Module Code
+    4) bid_cfgjsonurl : 없으면 window.bid.cfgjsonurl 로 치환 (Page 와 같은 Configuration)
+1.5. bidengine.fpGetConfig ( sUrl, fnCallback ) : Call BID Configuration
+    sUrl : Config JSON File URL
+    fnCallback( jError , jCfgBID )
+-- */
+bidengine.setengine = ( fcSetEngine = () => {} ) => {
+    // -- Setting Trigger Module Object HashChange --
+    bidengine.fpGetConfig( window.bid , ( eGetConfig, jCfgBID ) => {
+        if(eGetConfig) return fcSetEngine(eGetConfig) ;
+        window.bid = $.extend( true, window.bid, jCfgBID )  ;
+        /*--
+            location.origin 은 Page와 Bid Configuration 이 일치해야 할 경우 설정한다.
+        --*/
+        if( window.bid.origin_front ) {
+            if ( document.location.origin != window.bid.origin_front ) {
+                let eOrigin = {
+                    "err_code" : "@bid.base" ,
+                    "err_msg"  : "'window.bid.origin_front' Origin Mismatch '" + window.bid.origin_front + "'" ,
+                    "err_data" : null
+                }
+                fcSetEngine(eOrigin) ;
+            }
+        }
+        window.bid.protocol  = document.location.protocol   ;
+        jQuery.ajaxSetup( { "cache" : !window.bid.debug } ) ;
+
+        // -- Setting Request Get Data & Hash Data --
+        var aQueries = document.location.search.replace(/^\?/, '').split('&') ;
+        window.bid.get = {} ;
+        for( var i = 0; i < aQueries.length; i++ ) {
+            if(!aQueries[i]) continue ;
+            aSplit = aQueries[i].split('=') ;
+            window.bid.get[aSplit[0]] = decodeURIComponent(aSplit[1]) ;
+        }
+
+        window.bid.hash = bidengine.getlocationhash() ;
+        if (!window.bid.ajaxtimeout || (window.bid.ajaxtimeout <= 0) ) window.bid.ajaxtimeout = 60000 ;
+        jQuery.ajaxSetup( { "timeout" : window.bid.ajaxtimeout } ) ;
+
+        $(window).off("hashchange").on('hashchange', (jEvent, uDumy) => {
+            if( window.bidengine.sethashtag ) {
+                window.bidengine.sethashtag = false ;
+                return ;
+            }
+            let iCntAction = window.bidengine.objects.length ;
+            // console.log(window.bidengine.objects) ;
+            let jCurAction, sSelector, sHash ;
+            for ( let i = 0 ; i < iCntAction ; i ++ ) {
+                jCurAction = window.bidengine.objects[i] ;
+                sSelector  = "[data-bid-object='" + jCurAction.bid_object + "']" ;
+                if($(sSelector).length == 0) {
+                	sSelector  = "[bid_object='" + jCurAction.bid_object + "']" ;
+                }
+                sHash = window.bidengine.getlocationhash(jCurAction.bid_object) ;
+                if(sHash) {
+                    try {
+                        var jParamCur = JSON.parse(sHash) ;
+                        // console.log( "Call Hash : " + jParamCur.bid_method ) ;
+                        window.bidengine.callmodule( sSelector, jParamCur.bid_method, jParamCur ) ;
+                    }
+                    catch(eBlock) {
+                        // console.log("-- Hash Tag Error --") ;
+                        console.log(eBlock) ;
+                        window.bidengine.callmodule( sSelector , jCurAction.bid_method, jCurAction ) ;
+                        return ;
+                    }
+                }
+                else {
+                    window.bidengine.callmodule( sSelector , jCurAction.bid_method, jCurAction ) ;
+                }
+            }
+        } ) ;
+        fcSetEngine(null) ;
+    } ) ;
+} ;
+
+bidengine.startengine = (fcStartEngine = () => {} ) => {
+    bidengine.fpGetConfig( window.bid, (eGetCfgJson, jBID ) => {
+        if(eGetCfgJson) {
+            console.log(eGetCfgJson) ;
+            return fcStartEngine(eGetCfgJson, null) ;
+        }
+        window.bidengine.initobject() ;
+        $(window).trigger("hashchange") ;
+        fcStartEngine(null, jBID) ;
+    }) ;
+}
+
+bidengine.initobject = () => {
+    let iCntAction = window.bidengine.objects.length ;
+    bidengine.clog( 2, " Setting Trigger Module Object HashChange : " + iCntAction ) ;
+    let jCurAction, sSelector ;
+    for ( i = 0 ; i < iCntAction ; i ++ ) {
+        jCurAction = window.bidengine.objects[i] ;
+        sSelector  = "[data-bid-object='" + jCurAction.bid_object + "']" ;
+        if($(sSelector).length == 0) {
+        	sSelector  = "[bid-object='" + jCurAction.bid_object + "']" ;
+        }
+        if($(sSelector).length == 0) continue ;
+        $(sSelector).off("startmethod").on("startmethod", ( eStartMethod, jStartMethod) => {
+            if(!jStartMethod.bid_object) return ;
+            let sValue = JSON.stringify(jStartMethod) ;
+            window.bidengine.sethashtag = true ;
+            window.bidengine.setlocationhash(jStartMethod.bid_object, sValue) ;
+        }) ;
+    }
+} ;
+
+bidengine.IncludeClass = function( sBidModule, jBID, fcIncludeClass) {
+    let aCOM  = sBidModule.split(":") ;
+    jBID  = jBID?jBID:window.bid ;
+    let sJsFile = jBID.url_front + "/" +  aCOM[1] + "/" + aCOM[0] + "/" +  aCOM[2] + "/" +  aCOM[3] + ".js" ;
+    if(bidengine.buildday)
+        sJsFile += "?_bid_buildday=" + bidengine.buildday ;
+
+    bidengine.loadScript( sJsFile, window.bidclass[sBidModule], (eLoadScript, jLoadState) => {
+        if(eLoadScript)
+            return fcIncludeClass(eLoadScript, jLoadState) ;
+
+        if(window.bidclass[sBidModule].fpInitClass) {
+            window.bidclass[sBidModule].fpInitClass( jBID, (eInitClass, jInitClass) => {
+                return fcIncludeClass(eInitClass, jInitClass) ;
+            }) ;
+        }
+        else {
+            return fcIncludeClass(eLoadScript, jLoadState) ;
+        }
+    }) ;
+}
+
+bidengine.fnLoadClassCss = function( sBidModule, jBID, fcLoadClassCss = () => {} ) {
+    let aCOM  = sBidModule.split(":") ;
+    jBID  = jBID?jBID:window.bid ;
+    let sCssFile = jBID.url_front + "/" +  aCOM[1] + "/" + aCOM[0] + "/" +  aCOM[2] + "/" +  aCOM[3] + ".css" ;
+    if(bidengine.buildday)
+        sCssFile += "?_bid_buildday=" + bidengine.buildday ;
+    bidengine.loadCss(sCssFile) ;
+    return fcLoadClassCss ;
+}
+
+bidengine.frLoadingEmpty = ($Target) => {
+    // $Target.html("<div class='loading' style='width:100%;text-align:center;font-size:1rem;padding:0.5rem;border:0px solid #E1E1E1;font-weight:600px;border-radius:0.5rem'>Loading BID Module</div>") ;
+}
+
+bidengine.callmodule = function(oTarget, sCmd, jParam, fcCallModule = () => {} ) {
+    if ( typeof(oTarget) == "string" ) oTarget = $(oTarget) ;
+
+    jParam.bid_object = jParam.bid_object?jParam.bid_object:bidengine.uniqid("bid-") ;
+    oTarget.attr("bid_object", jParam.bid_object) ;
+    oTarget.attr("bid-object", jParam.bid_object) ;
+
+    // -- Setting Parameter : bid_module --
+    if(!jParam.bid_module) {
+        let eModule = {
+            "err_code" : "error" ,
+            "err_msg"  : "Not Found bid_module" ,
+            "err_data" : jParam
+        } ;
+        fcCallModule(eModule) ;
+        return false ;
+    }
+
+    switch(jParam.bid_module) {
+        case "blank" :
+            oTarget.empty() ;
+            oTarget.data("param", null) ;
+            oTarget.data("code",  null) ;
+            fcCallModule(null) ;
+            return ture ;
+        break ;
+    }
+
+    let aCOM = jParam.bid_module.split(":") ;
+    let jCurBid ;
+    // -- Type : jQuery Plugin Function Style --
+    switch(aCOM[0]) {
+        case "class" :
+            jParam.bid_cfgjsonurl = jParam.bid_cfgjsonurl?jParam.bid_cfgjsonurl:window.bid.cfgjsonurl ;
+            jCurBid = {
+                "cfgjsonurl" : jParam.bid_cfgjsonurl
+            } ;
+            bidengine.fpGetConfig( jCurBid, (eGetCfgJson , jBID ) => {
+                if(eGetCfgJson) {
+                    console.log(eGetCfgJson)  ;
+                    fcCallModule(eGetCfgJson) ;
+                    return
+                }
+                // Loading 이 안되었으면. Loading 한다.
+                bidengine.frLoadingEmpty(oTarget) ;
+                bidengine.IncludeClass( jParam.bid_module, jBID , ( eIncludeClass, jIncludeClass) => {
+                    if( eIncludeClass ) {
+                        oTarget.html( eIncludeClass.err_msg ) ;
+                        return fcCallModule(eIncludeClass, null) ;
+                    }
+                    window.bidobject[jParam.bid_object] = new window.bidclass[jParam.bid_module]( oTarget, jParam, jBID ) ;
+                    window.bidobject[jParam.bid_object].fnStartMethod(sCmd, null) ;
+                    fcCallModule( null, window.bidobject[jParam.bid_object] ) ;
+                } ) ;
+            }) ;
+        break ;
+        default :
+            jParam.bid_cfgjsonurl = jParam.bid_cfgjsonurl?jParam.bid_cfgjsonurl:window.bid.cfgjsonurl ;
+            jCurBid = {
+                "cfgjsonurl" : jParam.bid_cfgjsonurl
+            } ;
+            bidengine.fpGetConfig( jCurBid , function(eLoad, jBID ) {
+                if(eLoad) {
+                    console.log(eLoad) ;
+                    return ;
+                }
+                jBID.url_front = ( jBID.url_front )?jBID.url_front:jBID.http + jBID.link_front ;
+                jParam.bid_fronturl = jBID.url_front ;
+                let sJsFile = jBID.url_front + "/" +  aCOM[1] + "/" + aCOM[0] + "/" +  aCOM[2] + "/" +  aCOM[3] + ".js" ;
+
+                // Loading 이 안되었으면. Loading 한다.
+                bidengine.loadScript( sJsFile, jQuery.fn[jParam.bid_module] , function(eLoadScript, jLoadState) {
+                    if( eLoadScript ) {
+                        console.log(eLoadScript) ;
+                        return ;
+                    }
+                    // -- Parameter 를 이용하여, Object에서 사용하는 Code를 만든다. --
+                    let bIsSet = true ;
+                    let jTargetParam = oTarget.data("param") ;
+                    if(!jTargetParam)
+                        bIsSet = false ;
+                    else {
+                        bIsSet = ( jTargetParam.bid_module == jParam.bid_module )?true:false ;
+                        if(bIsSet) bIsSet = oTarget.data("code").isset ;
+                    }
+
+                    if( !bIsSet ) {
+                        let sModule_html = jBID.url_front + "/" +  aCOM[1] + "/" + aCOM[0] + "/" + aCOM[2] + "/" + aCOM[3] + ".html" ;
+
+                        // Setting Default Code Information of jQuery Selector
+                        var jCode   = {
+                            "bid" : jBID , // 객체가 사용할 BID Configuration
+                            "module_html"   : sModule_html  ,       // Html File 이 위치한 URL. 프로토콜 포함 "://"
+                            "url_proc"      : jBID.url_cgi  ,
+                            "object_key"    : bidengine.getuuid() , // 객체 Key 값
+                            "isset"         : false                 // 객체가 아직 설치가 완료되지 않았음.
+                        } ;
+                        oTarget.data( "code", jCode ) ;
+                    }
+
+                    if(!oTarget[jParam.bid_module]) {
+                        oTarget.html("Not Found Module [ " + jParam.bid_module + " ]") ;
+                        fcCallModule( null, oTarget ) ;
+                    }
+                    else {
+                        oTarget[jParam.bid_module](sCmd, jParam, jCode) ;
+                        fcCallModule( null, oTarget ) ;
+                    }
+                } ) ;
+            } ) ;
+        break ;
+    }
+}
+
+bidengine.fnCallObject = ( $Target, sCmd, jParam = {}, fcCallObject = () => {} ) => {
+    if ( typeof($Target) == "string" ) $Target = $($Target) ;
+    if ( $Target.length == 0 ) {
+        window.biderror = {
+            "err_code" : "error" ,
+            "err_msg"  : "Not Found jQuery Document Selector" ,
+            "_param"   : jParam
+        } ;
+        fcCallObject(window.biderror) ;
+        return false ;
+    }
+    let sCurObject = $Target.attr("bid-object") ;
+    console.log("Current BID Object : " + sCurObject ) ;
+    // 전처리명령을 실행한다.
+
+    if(!jParam.bid_object)
+        jParam.bid_object = sCurObject?sCurObject:bidengine.uniqid("tmp-") ;
+
+    if(jParam.bid_object != sCurObject) {
+        bidengine.fnDeleteObject(sCurObject) ;
+        $Target.attr("bid-object", jParam.bid_object) ;
+        console.log("Change BID Object : " + jParam.bid_object ) ;
+    }
+
+    if( window.bidobject[jParam.bid_object] ) {
+        console.log("Exist BID Object : " + jParam.bid_object ) ;
+        window.bidobject[jParam.bid_object].fnStartMethod(sCmd, jParam ) ;
+        fcCallObject( null, window.bidobject[jParam.bid_object] ) ;
+        return true ;
+    }
+
+    // -- Setting Parameter : bid_module --
+    if(!jParam.bid_module) {
+        window.biderror = {
+            "err_code" : "error" ,
+            "err_msg"  : "Not Found bid_module" ,
+            "err_data" : jParam
+        } ;
+        fcCallObject(window.biderror) ;
+        return false ;
+    }
+
+    jParam.bid_cfgjsonurl = jParam.bid_cfgjsonurl?jParam.bid_cfgjsonurl:window.bid.cfgjsonurl ;
+    let jCurBid = {
+        "cfgjsonurl" : jParam.bid_cfgjsonurl
+    } ;
+    bidengine.fpGetConfig( jCurBid, (eGetCfgJson , jBID ) => {
+        if(eGetCfgJson)
+            return fcCallObject(eGetCfgJson) ;
+        bidengine.IncludeClass( jParam.bid_module, jBID , ( eIncludeClass, jIncludeClass ) => {
+            console.log("Loading Module Class : " + jParam.bid_module ) ;
+            if( eIncludeClass )
+                return fcCallObject(eIncludeClass, null) ;
+            // console.log( jIncludeClass ) ;
+            window.bidobject[jParam.bid_object] = new window.bidclass[jParam.bid_module]( $Target, jParam, jBID ) ;
+            if(sCmd)
+                window.bidobject[jParam.bid_object].fnStartMethod(sCmd, jParam ) ;
+            fcCallObject( null, window.bidobject[jParam.bid_object] ) ;
+        } ) ;
+    }) ;
+    return true ;
+}
+
+bidengine.fnDeleteObject = ( sBidObject, bRemoveSelector = false ) => {
+    let jDelTag = { "bidobj" : false , "biddoc" : false } ;
+    if(window.bidobject[sBidObject]) {
+        console.log("Delete BID Object : " + sBidObject ) ;
+        delete window.bidobject[sBidObject] ;
+        jDelTag.bidobj = true ;
+    }
+    let $Target = $("[bid-object='"+sBidObject+"']") ;
+    if($Target.length > 0) {
+        $Target.empty() ;
+        $Target.removeAttr("bid-object") ;
+        if(bRemoveSelector)
+            $Target.remove() ;
+        jDelTag.biddoc = true ;
+    }
+    return jDelTag ;
+}
+
+bidengine.fnCleanObject = () => {
+    let $Target ;
+    let jCleanTag = {
+        "deleteobjects" : []
+    } ;
+    Object.keys(window.bidobject).forEach(sBidObject => {
+        $Target = $("[bid-object='"+sBidObject+"']") ;
+        if($Target.length == 0) {
+            delete window.bidobject[sBidObject] ;
+            jCleanTag.deleteobjects.push(sBidObject) ;
+        }
+    });
+    return jCleanTag ;
+} ;
+
+bidengine.fnMakeupConfig = (jCurBid) => {
+    // Setting 6 Link - 더 이상 사용하지 않을 예정
+    jCurBid.link_app      = jCurBid.link_app?jCurBid.link_app:"/bid_app" ;
+    jCurBid.link_config   = jCurBid.link_config?jCurBid.link_config:"/bid_config" ;
+    jCurBid.link_front    = jCurBid.link_front?jCurBid.link_front:"/bid_front" ;
+    jCurBid.link_frontext = jCurBid.link_frontext?jCurBid.link_frontext:"/bid_frontext" ;
+    jCurBid.link_file     = jCurBid.link_file?jCurBid.link_file:"/bid_file"    ;
+    jCurBid.link_proc     = jCurBid.link_proc?jCurBid.link_proc:"/bid_config/cgi." + jCurBid.cgi_ext ;
+
+    /* URL 설정 --
+        *. "url_init"      : 이미 설정
+        *. "url_socket"    : 이미 설정
+        1. "url_config"    : null ,
+        2. "url_app"       : null ,
+        3. "url_front"     : null ,
+        4. "url_frontext"  : null ,
+        5. "url_file"      : null ,
+        6. "url_proc"      : 이 부분은 변경요망, 앞으로 url_cgi 로 변경처리
+        7. "url_cgi"       : null ,
+    */
+    jCurBid.url_config    = jCurBid.url_config?jCurBid.url_config:jCurBid.url_init + "/bid_config/" ;
+    jCurBid.url_app       = jCurBid.url_app?jCurBid.url_app:jCurBid.url_init + "/bid_app/" ;
+    jCurBid.url_front     = jCurBid.url_front?jCurBid.url_front:jCurBid.url_init + "/bid_front/" ;
+    jCurBid.url_frontext  = jCurBid.url_frontext?jCurBid.url_frontext:jCurBid.url_init + "/bid_frontext/" ;
+    jCurBid.url_file      = jCurBid.url_file?jCurBid.url_file:jCurBid.url_init + "/bid_file/" ;
+    jCurBid.url_proc      = jCurBid.url_proc?jCurBid.url_proc:jCurBid.url_init + "/bid_config/cgi." + jCurBid.cgi_ext ;
+    jCurBid.url_cgi       = jCurBid.url_cgi?jCurBid.url_cgi:jCurBid.url_init + "/bid_config/cgi." + jCurBid.cgi_ext ;
+
+    // Set Data
+    jCurBid.pkg_param = jCurBid.pkg_param?jCurBid.pkg_param:{} ;
+    jCurBid.ext_param = jCurBid.ext_param?jCurBid.ext_param:{} ;
+    jCurBid.set_pkg   = jCurBid.set_pkg?jCurBid.set_pkg:{}   ;
+    jCurBid.set_ext   = jCurBid.set_ext?jCurBid.set_ext:{}   ;
+    jCurBid.set_user  = jCurBid.set_user?jCurBid.set_user:{} ;
+    window.bidengine.configs.push ( jCurBid ) ;
+    return jCurBid ;
+} ;
+
+bidengine.fpGetConfig = (jCurBid, fcGetCfgjson) => {
+    // -- Check Loading BID Config --
+    let aTconfig = window.bidengine.configs.filter((jBID) => { return jBID.cfgjsonurl === jCurBid.cfgjsonurl ; } ) ;
+    if( aTconfig.length > 0 ) return fcGetCfgjson( null, aTconfig[ aTconfig.length - 1 ] ) ;
+
+    if( jCurBid.site_key ) {
+        jCurBid = bidengine.fnMakeupConfig(jCurBid) ;
+        return fcGetCfgjson( null, jCurBid ) ;
+    }
+
+    // -- /Check Loading BID Config --
+    $.ajax ( {
+        "type"      : "GET"  ,
+        "url"       : jCurBid.cfgjsonurl  ,
+        "cache"     : false ,
+        "async"     : true  ,
+        "crossDomain" : true ,
+        "dataType"  : "json" ,
+        "success"   : (jReturn) => {
+            let jCfgBID = jQuery.extend( true, {}, jReturn ) ;
+            if(jCfgBID.site_id == "error") {
+                let eGetCfgJson = {
+                    "err_code" : "@bid.base" ,
+                    "err_msg"  : "Error Loading Config Json File" ,
+                    "response" : jReturn
+                } ;
+                return fcGetCfgjson( eGetCfgJson, null ) ;
+            }
+            jCfgBID.cfgjsonurl  = jCurBid.cfgjsonurl ;
+            jCfgBID = bidengine.fnMakeupConfig(jCfgBID) ;
+            return fcGetCfgjson( null, jCfgBID ) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eAjax = {
+                "err_code" : "@bid.base" ,
+                "err_msg"  : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, true) ,
+                "err_data" : null
+            }
+            return fcGetCfgjson( eAjax, null) ;
+        }
+    }) ;
+}
+
+/* -- bidengine Load Resource Library : 4 개 --
+1. bidengine.loadScript ( sUrl, jObject, fnCallback )  : Load Javascript
+    sUrl : Javascript File URL
+    jObject : 필요한 Javascript Object Loading 판단 유무
+    fnCallback ( jError, { "loading" : true/false } )
+2. bidengine.MultiloadScript ( aLoadInfo, fnCallback ) : 다중 Load Javascript
+    aLoadInfo : Javascrit Url & jObject Information Array
+    fnCallback( jError )
+3. bidengine.loadCss (sUrl) : Load CSS Style File
+    sUrl : CSS Style File Url
+4. bidengine.loadHtml ($This, fnCallback) : 컴퍼넌트 지정 Html Skin Loading
+    $This : 컴퍼넌트 지정 jQuery Selector
+    fnCallback( jError ) ;
+-- */
+
+bidengine.loadScript = (sUrl, jObject, fcLoadScript = () => {} ) => {
+    if ( typeof(jObject) != "string" ) {
+        try {
+            jObject = eval(jObject) ;
+        }
+        catch( jEobject ) {
+            console.log( jEobject ) ;
+            fcLoadScript( {
+                "err_code" : "bidengine.loadScript" ,
+                "err_msg"  : jEobject.toString() ,
+                "err_data" : null
+            } , { "loading" : false } ) ;
+            return ;
+        }
+    }
+
+    if ( jObject != undefined ) return fcLoadScript(null, { "loading" : false } ) ;  // Return of Exist
+    if ( window.bidscript.indexOf(sUrl) >= 0 ) return fcLoadScript(null, { "loading" : false } ) ;  // Return of Exist
+
+    jQuery.ajax ( {
+        type    : "GET"  ,
+        url     : sUrl   ,
+        async   : true   ,
+        data    : null   ,
+        crossDomain : true ,
+        dataType: "script" ,
+        success :  () => {
+            window.bidscript.push(sUrl) ;
+            fcLoadScript( null, { "loading" : true } ) ;
+        } ,
+        error : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                "err_code"  : "bidengine.loadScript" ,
+                "err_msg"   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                "err_data"  : ""
+            } ;
+            return fcLoadScript( eResult ) ;
+        }
+    } ) ;
+}
+
+bidengine.MultiloadScript = ( aLoadInfo, fcMultiloadScript ) => {
+    let fiLooploadScript = ( iIndex ) => {
+        if( aLoadInfo.length <= iIndex )
+            return fcMultiloadScript( null ) ;
+        let jObject = (typeof(aLoadInfo[iIndex].obj) == "string")?eval(aLoadInfo[iIndex].obj):aLoadInfo[iIndex].obj ;
+        let sJsUrl  = bidengine.fgAddQueryStringToUrl( aLoadInfo[iIndex].url, { "_bid_buildday" : bidengine.buildday } ) ;
+        bidengine.loadScript(sJsUrl, jObject, ( eLoad, jStateLoad ) => {
+            if(eLoad)
+                return fcMultiloadScript(eLoad) ;
+            fiLooploadScript( iIndex + 1 ) ;
+        } ) ;
+    }
+    fiLooploadScript(0) ;
+} ;
+
+bidengine.loadCss = function(sUrlCssParam) {
+    let sUrlCss = bidengine.fgAddQueryStringToUrl( sUrlCssParam, { "_bid_buildday" : bidengine.buildday } ) ;
+    if($("head").find("link").filter("[href='"+sUrlCss+"']").attr("href") == sUrlCss) return ;
+
+    jQuery("head").append("<link>") ;
+    var css = $("head").children(":last");
+    css.attr  ( {
+        "rel"   : "stylesheet" ,
+        "type"  : "text/css" ,
+        "cf-async" : "false" ,
+        "href"  : sUrlCss
+    }) ;
+}
+
+bidengine.fpLoadCssFile  = ( sUrlCssParam, fcLoadCssFile = () => {}) => {
+    let sUrlCss = bidengine.fgAddQueryStringToUrl( sUrlCssParam, { "_bid_buildday" : bidengine.buildday } ) ;
+    if($("head").find("link").filter("[href='"+sUrlCss+"']").attr("href") == sUrlCss)
+        return fcLoadCssFile(null, { "isLoad" : false }) ;
+
+    const doCssLink = document.createElement('link') ;
+    doCssLink.rel  = 'stylesheet' ;
+    doCssLink.href = sUrlCss ;
+
+    doCssLink.onload = () => {
+        console.log("CssFile : " + sUrlCss + " 로딩 완료" ) ;
+        return fcLoadCssFile(null, { "isLoad" : true }) ;
+    } ;
+    doCssLink.onerror = () => {
+        console.error(`${sUrlCss} 로딩 실패`) ;
+        return fcLoadCssFile({
+            "err_code" : "bidengine.LoadCssFile" ,
+            "err_msg"  : `${sUrlCss} 로딩 실패`
+        }) ;
+    };
+    document.head.appendChild(doCssLink) ;
+} ;
+
+bidengine.fpMultiloadCss = ( aLoadInfo, fcMultiloadCss ) => {
+    let fiLooploadCss = ( iIndex ) => {
+        if( aLoadInfo.length <= iIndex )
+            return fcMultiloadCss( null, aLoadInfo) ;
+        let sUrlCss = aLoadInfo[iIndex].url ;
+        bidengine.fpLoadCssFile(sUrlCss, ( eLoadCss, jLoadCss ) => {
+            if(eLoadCss) {
+                aLoadInfo[iIndex].errinfo = eLoadCss ;
+                return fcMultiloadCss(eLoadCss) ;
+            }
+            else {
+                aLoadInfo[iIndex].loadinfo = jLoadCss ;
+            }
+
+            fiLooploadCss( iIndex + 1 ) ;
+        } ) ;
+    }
+    fiLooploadCss(0) ;
+} ;
+
+
+bidengine.loadHtml = function($This, fcloadHtml = () => {}) {
+    let jCode  = $This.data("code"), jParam  = $This.data("param") ;
+    let hModule = window.bidhtml[jParam.bid_module] ;
+    if(hModule) {
+        $This.html(hModule) ;
+        return fcloadHtml(null) ;
+    }
+    $.ajax( {
+        "url" : jCode.module_html ,
+        "async"   : true ,
+        "success" : function(hResult) {
+            $This.html(hResult) ;
+            window.bidhtml[jParam.bid_module] = hResult ;
+            fcloadHtml(null) ;
+        } ,
+        "error" : function(jXHR, sAjaxStatus, eThrown) {
+            var eResult = {
+                err_code  : "jquery.ajax" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) + "\n" + jCode.module_html ,
+                err_data  : jXHR.responseText
+            } ;
+            fcloadHtml(eResult) ;
+        }
+    });
+} ;
+
+bidengine.loadModuleHtml = function($This, sCodeModule, sUrlModule, fcloadModuleHtml = ()=>{} ) {
+    let hModule = window.bidhtml[sCodeModule] ;
+    if(hModule) {
+        if($This) $This.html(hModule) ;
+        return fcloadModuleHtml( null, hModule) ;
+    }
+    let sUrlModuleHtml = bidengine.fgAddQueryStringToUrl( sUrlModule, { "_bid_buildday" : bidengine.buildday } ) ;
+    $.ajax( {
+        "url"     : sUrlModuleHtml ,
+        "async"   : true ,
+        "success" : (hResult) => {
+            if($This) $This.html(hResult) ;
+            window.bidhtml[sCodeModule] = hResult ;
+            fcloadModuleHtml(null, hResult) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            var eResult = {
+                err_code  : "jquery.ajax" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) + "\n" + sUrlModule ,
+                err_data  : jXHR.responseText
+            } ;
+            fcloadModuleHtml(eResult, null) ;
+        }
+    }) ;
+} ;
+
+bidengine.fpLoadClassHtml = ( jBID, sClsCode, fcLoadClassHtml = () => {}) => {
+    let hModule = window.bidhtml[sClsCode] ;
+    if(hModule)
+        return fcLoadClassHtml( null, hModule) ;
+    let aCOM = sClsCode.split(":") ;
+    let sUrlHtml  = jBID.url_front + "/" + aCOM[1] + "/" + aCOM[0] + "/" + aCOM[2] + "/" + aCOM[3] + ".html"  ;
+    let sUrlHtmlParam = bidengine.fgAddQueryStringToUrl( sUrlHtml, { "_bid_buildday" : bidengine.buildday } ) ;
+
+    $.ajax( {
+        "url"     : sUrlHtmlParam ,
+        "async"   : true ,
+        "cache"   : true ,
+        "success" : (hResult) => {
+            window.bidhtml[sClsCode] = hResult ;
+            fcLoadClassHtml(null, hResult) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                "err_code" : sAjaxStatus + "@jquery.ajax" ,
+                "err_msg"  : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) + "\n" + sUrlHtml ,
+                "response" : jXHR.responseText
+            } ;
+            fcLoadClassHtml(eResult, null) ;
+        }
+    }) ;
+} ;
+
+/* -- bidengine Utility Library : 9 개 --
+1. bidengine.chkmobile ()  : 기계가 Mobile 인지 아닌지 확인
+    * Return : true/false
+2. bidengine.number_format( fNum ) : 숫자에 3자리마다. ','
+    fNum : 숫자
+    * Return : String "###,###"
+3. bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, tag_ind) : jQuery XHR ERROR -> String
+    jXHR, sAjaxStatus, eThrown : jQuery XHR ERROR
+    tag_ind : Html Tag 추가 유무 true/false
+    $ Return : Error String
+4. bidengine.getuuid (sSep) : Make UUID
+    sSep : Seperator "-"
+    * Return : UUID
+5. bidengine.clog (oLog) : BID Engine 의 console.log() 확장
+    oLog : 출력 대상
+6. bidengine.uniqid(prefix, more_entropy) : Uniq ID 생성
+    prefix : Uniq ID 의 앞에 붙을 String
+    more_entropy : true / false
+    * Return : String Uniq ID
+7. bidengine.makeid (iLength) : 지정 글자수 만큼 ID 생성
+    iLength : 지정글자수
+    * Return : String ID
+8. bidengine.parseURL (url) : URL 정보를 지정한 JSON 방식으로 생성
+    url : String URL
+    * Return : JSON Parsing URL
+    {
+        protocol: parser.protocol,
+        host: parser.host,
+        hostname: parser.hostname,
+        port: parser.port,
+        pathname: parser.pathname,
+        search: parser.search,
+        searchObject: searchObject,
+        hash: parser.hash
+    }
+9. bidengine.unparam (url) : jQuery.param 의 반대
+    url : String URL
+10. bidengine.padnumber (iLen, iSource, sPad) : 지정된 길이로, 문자를 채우는 함수
+    iLen : 지정된 길이
+    iSource : 원시 숫자
+    sPad : 채워질 문자
+11. bidengine.getstringtime (tsCur, sTag) : TimeStamp로 Date String 을 Return 한다.
+    tsCur : TimeStamp MiliSecond
+    sTag  : Date String Format Code Tag
+-- */
+
+bidengine.chkmobile = () => {
+    var UserAgent = navigator.userAgent;
+    if (UserAgent.match(/iPhone|iPod|Android|Windows CE|BlackBerry|Symbian|Windows Phone|webOS|Opera Mini|Opera Mobi|POLARIS|IEMobile|lgtelecom|nokia|SonyEricsson/i) != null || UserAgent.match(/LG|SAMSUNG|Samsung/) != null)
+        return true ;
+    return false ;
+}
+
+bidengine.number_format = (fNum) => {
+    // Check fNumber
+    if(isNaN(fNum) || fNum == "") return 0 ;
+    if(fNum == 0) return 0 ;
+    var reg = /(^[+-]?\d+)(\d{3})/;
+    var n = (fNum + '') ;
+    while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+    return n;
+}
+
+bidengine.jquery_xhrerror = (jXHR, sAjaxStatus, eThrown, tag_ind) => {
+    let sError ;
+    if (tag_ind) {
+        sError  = "sAjaxStatus : " + sAjaxStatus
+                + "<br/>eThrown : " + eThrown
+                + "<br/>jXHR.status : " + jXHR.status
+                + "<br/>jXHR.statusText : " + jXHR.statusText ;
+    }
+    else {
+        sError  = "sAjaxStatus : " + sAjaxStatus
+                + "\n" + "eThrown : " + eThrown
+                + "\n" + "jXHR.status : " + jXHR.status
+                + "\n" + "jXHR.statusText : " + jXHR.statusText ;
+    }
+    return sError ;
+}
+
+bidengine.getuuid = (sGsep) => {
+    var sSep = sGsep?sGsep:"" ;
+    var S4 = function () { return  Math.floor(Math.random() * 0x10000).toString(16) ; } ;
+    return ( S4() + S4() + sSep + S4() + sSep + S4() + sSep + S4() + sSep + S4() + S4() + S4() ) ;
+} ;
+
+bidengine.clog = () => {
+    if(!window.bid) return ;
+    if(!window.bid.debug) return ;
+    let sHeader = "#BID LOG " ;
+    let iArg = arguments.length ;
+    let iClogLevel = (bid.cloglevel > 0)?bid.cloglevel:0 ;
+    if(iArg == 0) {
+        return console.log(sHeader + ": bidengine.version is " + window.bidengine.version) ;
+    }
+    if(typeof(arguments[0]) != "number") {
+        console.log(arguments[0]) ;
+        return console.log(sHeader + ": Argument 첫번째는 무조건 숫자이어야 다음 내역을 볼 수 있습니다.") ;
+    }
+    if( arguments[0] < 0 ) {
+        arguments[1] = arguments[1]?arguments[1]:"bidengine" ;
+        console.log(sHeader + ": " + bidengine.getstringtime(null, "Y.m.d H:i:s") + " (" + arguments[1] + ")" ) ;
+        switch(arguments[1]) {
+            case "bidobject" :
+                console.log(window.bidobject) ;
+            break ;
+            default :
+                console.log(window.bidengine) ;
+            break ;
+        }
+        return ;
+    }
+    if( iClogLevel > arguments[0] ) return ;
+    console.log(sHeader + ": " + bidengine.getstringtime(null, "Y.m.d H:i:s") + " (" + arguments[0] + " Level)" ) ;
+    for( let i = 1 ; i < iArg ; i ++ ) {
+        console.log(arguments[i]) ;
+    }
+} ;
+
+bidengine.uniqid = (prefix, more_entropy) => {
+    // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+    // +    revised by: Kankrelune (http://www.webfaktory.info/)
+    // %        note 1: Uses an internal counter (in php_js global) to avoid collision
+    // *     example 1: uniqid();
+    // *     returns 1: 'a30285b160c14'
+    // *     example 2: uniqid('foo');
+    // *     returns 2: 'fooa30285b1cd361'
+    // *     example 3: uniqid('bar', true);
+    // *     returns 3: 'bara20285b23dfd1.31879087'
+    if (typeof prefix === 'undefined') prefix = "";
+
+    var retId;
+    var formatSeed = function (seed, reqWidth) {
+        seed = parseInt(seed, 10).toString(16); // to hex str
+        if (reqWidth < seed.length) { // so long we split
+            return seed.slice(seed.length - reqWidth);
+        }
+        if (reqWidth > seed.length) { // so short we pad
+            return Array(1 + (reqWidth - seed.length)).join('0') + seed;
+        }
+        return seed ;
+    };
+
+    // BEGIN REDUNDANT
+    if (!this.php_js) {
+        this.php_js = {} ;
+    }
+
+    // END REDUNDANT
+    if (!this.php_js.uniqidSeed) { // init seed with big random int
+        this.php_js.uniqidSeed = Math.floor(Math.random() * 0x75bcd15);
+    }
+    this.php_js.uniqidSeed++;
+
+    retId = prefix; // start with prefix, add current milliseconds hex string
+    retId += formatSeed(parseInt(new Date().getTime() / 1000, 10), 8);
+    retId += formatSeed(this.php_js.uniqidSeed, 5); // add seed hex string
+    if (more_entropy) {
+        // for more entropy we add a float lower to 10
+        retId += (Math.random() * 10).toFixed(8).toString();
+    }
+    return retId;
+} ;
+
+bidengine.makeid = (iLength, sRndType = "NA" ) => {
+    let sText = "" ;
+    let aRndType = Array.from(sRndType) ;
+
+    // let sPossible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ;
+    let sPossible = "", cChar ;
+
+    for( let i = 0 ; i < aRndType.length ; i ++ ) {
+        cChar = aRndType[i] ;
+        switch(cChar) {
+            case "A"  : sPossible += "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ;          break ;
+            case "a"  : sPossible += "abcdefghijklmnopqrstuvwxyz" ;          break ;
+            case "N"  : sPossible += "0123456789" ;                          break ;
+            case "#"  : sPossible += "!@#$%^&"    ;                          break ;
+        }
+    }
+    for ( let i = 0 ; i < iLength ; i++ )
+        sText += sPossible.charAt(Math.floor(Math.random() * sPossible.length)) ;
+
+    return sText ;
+} ;
+
+bidengine.parseURL = (sParseUrl = null) => {
+    sParseUrl = sParseUrl?sParseUrl:document.location.href ;
+    var parser = document.createElement('a') , searchObject = {} , queries, split, i ;
+    // Let the browser do the work
+    parser.href = sParseUrl ;
+    // Convert query string to object
+    queries = parser.search.replace(/^\?/, '').split('&');
+    for( i = 0; i < queries.length; i++ ) {
+        split = queries[i].split('=') ;
+        if(!split[0]) continue ;
+        searchObject[split[0]] = split[1];
+    }
+    return {
+        protocol: parser.protocol,
+        host: parser.host,
+        hostname: parser.hostname,
+        port: parser.port,
+        pathname: parser.pathname,
+        search: parser.search,
+        searchObject: searchObject,
+        hash: parser.hash
+    } ;
+} ;
+
+bidengine.fgUrlQueryParam = (jConfig, sParseUrl = null) => {
+    sParseUrl = sParseUrl?sParseUrl:document.location.href ;
+    let jParseUrl   = bidengine.parseURL(sParseUrl) ;
+    let jQueryParam = JSON.parse(JSON.stringify(jParseUrl.searchObject)) ;
+    if(!jQueryParam.bid_route && jConfig.rewrite_url && jParseUrl.pathname.includes("bid_route/")) {
+        jQueryParam.bid_route = jParseUrl.pathname.replace("bid_route/", "") ;
+    }
+    return jQueryParam?jQueryParam:{} ;
+} ;
+
+bidengine.fgAddQueryStringToUrl = (sUrl, jQuery) => {
+    const oUrl = new URL(sUrl) ;
+    // 기존 URL에 새로운 쿼리 매개변수 추가
+    Object.keys(jQuery).forEach( sKey => oUrl.searchParams.append(sKey, jQuery[sKey]));
+    // 수정된 URL 반환
+    return oUrl.toString() ;
+}
+
+bidengine.unparam = (url) => {
+    let vars = {}, hash, i, urlParams = url.indexOf('?') > -1 ? url.split('?')[1] : url ;
+    try {
+        let hashes = urlParams.split('&');
+        for(i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars[hash[0]] = decodeURIComponent(hash[1]).replace(/\+/g, ' ');
+        }
+    }
+    catch(eCatch) {
+        console.log(eCatch) ;
+    }
+    return vars ;
+} ;
+
+bidengine.padnumber = (iLen, iSource, sPad) => {
+    let sPadding  = sPad||'0';
+    let sSource   = iSource + "" ;
+    return sSource.length >= iLen ? sSource : new Array(iLen - sSource.length + 1).join(sPadding) + sSource ;
+} ;
+
+bidengine.getstringtime = ( tsCur, sTag ) => {
+    let sStrTime = "" ;
+    tsCur = tsCur?tsCur:new Date().getTime() ;
+    let dDate = new Date(parseInt(tsCur)) ;
+    let sYYYY = bidengine.padnumber( 4, dDate.getFullYear()  , "0" ) ;
+    let sYY   = sYYYY.substring(2) ;
+    let sMon  = bidengine.padnumber( 2, dDate.getMonth() + 1 , "0" ) ;
+    let sDate = bidengine.padnumber( 2, dDate.getDate()  , "0" ) ;
+    let sHour = bidengine.padnumber( 2, dDate.getHours() , "0" ) ;
+    let sMin  = bidengine.padnumber( 2, dDate.getMinutes() , "0" ) ;
+    let sSec  = bidengine.padnumber( 2, dDate.getSeconds() , "0" ) ;
+    let sMsec = bidengine.padnumber( 2, dDate.getMilliseconds() , "0" ) ;
+    switch(sTag) {
+        case "inputdatetime" :
+            sStrTime = sYYYY + "-" + sMon + "-" + sDate + "T" + sHour + ":" + sMin ;
+        break ;
+        case "text.noyear.datetime" :
+            sStrTime = sMon + "/" + sDate + " " + sHour + ":" + sMin ;
+        break ;
+        case "inputdate" :
+        	sStrTime = sYYYY + "-" + sMon + "-" + sDate ;
+        break ;
+        case "datetime.ms" :
+            sStrTime = sYYYY + "-" + sMon + "-" + sDate + "T" + sHour + ":" + sMin + ":" + sSec + "." + sMsec ;
+        break ;
+        default :
+            sStrTime = sTag.replace(/Y/g, sYYYY ).replace(/y/g, sYY ).replace(/m/g, sMon ).replace(/d/g, sDate )
+                       .replace(/H/g, sHour ).replace(/i/g, sMin).replace(/s/g, sSec ) ;
+        break ;
+    }
+    return sStrTime ;
+} ;
+
+bidengine.JSONHighLight = ( $Body, jSource ) => {
+    function syntaxHighlight(json) {
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>' ;
+        });
+    }
+
+    let sJson = JSON.stringify(jSource, undefined, 4) ;
+    $Body.html(syntaxHighlight(sJson)) ;
+    $Body.find(".string").css("color","green") ;
+    $Body.find(".number").css("color","darkorange") ;
+    $Body.find(".boolean").css("color","blue") ;
+    $Body.find(".null").css("color","magenta") ;
+    $Body.find(".key").css("color","red") ;
+}
+
+
+/* -- bidengine Hash Library : 3 개 --
+1. bidengine.getlocationhash ( sKey )  : Hash Key 값을 가지고 온다.
+    * Return : String Value
+2. bidengine.setlocationhash ( sKey, sValue , bOnlySet ) : Hash Key 값을 설정한다.
+    sKey : Hash key
+    sValue : Hash Value
+    bOnlySet : Setting 만 할 것인지 아니면, 동작할 것인지 판단
+3. bidengine.makehashtag ( sKey, sValue ) : Hash Key 값을 String 으로 Return 한다.
+    sKey : Hash key
+    sValue : Hash Value
+    $ Return : Param String
+-- */
+
+bidengine.getlocationhash = function( sKey ) {
+    let sHash = window.location.hash.substring(1) ;
+    let jHash = (sHash=="")?{}:bidengine.unparam(sHash) ;
+    return (sKey)?jHash[sKey]:jHash ;
+} ;
+
+bidengine.setlocationhash = function( sKey, sValue, bOnlySet = true, bInit = false ) {
+    let sHash, jHash ;
+    if(bInit) {
+        jHash = {} ;
+    }
+    else {
+        sHash = window.location.hash.substring(1) ;
+        jHash = (sHash=="")?{}:bidengine.unparam(sHash) ;
+    }
+    console.log(sValue) ;
+    jHash[sKey] = sValue ;
+    sHash = $.param(jHash) ;
+    window.bidengine.sethashtag = bOnlySet ;
+    window.location.hash = sHash ;
+} ;
+
+bidengine.setlocationhashjson = ( jSetHash, bOnlySet = true, bInit = false ) => {
+    let sHash, jHash ;
+    if(bInit) {
+        jHash = {} ;
+    }
+    else {
+        sHash = window.location.hash.substring(1) ;
+        jHash = (sHash=="")?{}:bidengine.unparam(sHash) ;
+    }
+    Object.assign(jHash,jSetHash) ;
+    sHash = $.param(jHash) ;
+    window.bidengine.sethashtag = bOnlySet ;
+    window.location.hash = sHash ;
+} ;
+
+bidengine.makehashtag = function( sKey, sValue, bInit = false ) {
+    let sHash, jHash ;
+    if(bInit) {
+        jHash = {} ;
+    }
+    else {
+        sHash = window.location.hash.substring(1) ;
+        jHash = (sHash=="")?{}:bidengine.unparam(sHash) ;
+    }
+    jHash[sKey] = sValue ;
+    return $.param(jHash) ;
+} ;
+
+/*-- 13. 객체주요함수 "urlhash" : URL Hash Tag 와 관련된 함수 --
+    13.1. fnGetJsonUrlHash(sHashCode) : Hash Tag 정보에서 jParam 정보로 데이타를 이동한다.
+    13.2. fnActJsonUrlHash(sHashCode, jHashPrep) : Hash Tag 정보를 설정한다. HashChange Event 가 발생한다.
+--*/
+bidengine.fnGetJsonUrlHash = (sHashCode) => {
+    let sHashValue = bidengine.getlocationhash(sHashCode) ;
+    try {
+        if(sHashValue)
+            return JSON.parse(sHashValue) ;
+        return {} ;
+    }
+    catch(eCatch) {
+        console.log("Error HashCode : " + sHashCode) ;
+        return {} ;
+    }
+} ;
+
+bidengine.fnSetJsonUrlHash = (sHashCode, jHashPrep) => {
+    jHashPrep._bid_ts = new Date().getTime() ;
+    bidengine.setlocationhash(sHashCode, JSON.stringify(jHashPrep)) ;
+} ;
+
+/*---- Bid Certification Library : 6 개 ----
+1. bidengine.login ( jBID, jLogin, fnCallback) : 회원로그인
+    jBID : BID Configuration
+    jLogin : user_id, user_pw, keep = true / false
+    fnCallback : Callback Function ( jError, UserInfo)
+2. bidengine.logout ( jBID, fnCallback) : 회원로그아웃
+    jBID : BID Configuration
+    fnCallback : Callback Function ( jError, True / False )
+3. bideigne.logstate ( jBID, fnCallback) : 회원현재 상황 확인
+    jBID : BID Configuration
+    fnCallback : Callback Function ( jError, UserInfo )
+4. bidengine.logswitch( jBID, jLogSwitch, fcLogSwitch)
+    jLogSwitch : switch_user
+-------------------------------------*/
+bidengine.login = function( jBID, jLogin, fcLogin) {
+    if( typeof(fcLogin) != "function" ) fcLogin = function(){} ;
+
+    // app_id 처리
+    let sAppId  = (window.bidapp)?window.bidapp.app_id:"" ;
+    let sSysKey = (window.bidapp)?window.bidapp.sys_key:"" ;
+    sAppId  = jLogin.app_id?jLogin.app_id:sAppId ;
+    sSysKey = jLogin.sys_key?jLogin.sys_key:sSysKey ;
+
+    let jData   = {
+        bid_module    : "module:bid.base:util:tokenauth" ,
+        bid_proccode  : "login" ,
+        bid_datatype  : "json"  ,
+
+        user_id   : jLogin.user_id ,
+        user_pw   : jLogin.user_pw ,
+        org_id    : jLogin.org_id  ,
+        keep      : jLogin.keep    ,
+        auth_type : jLogin.auth_type ,
+        app_id    : sAppId ,
+        sys_key   : sSysKey
+    } ;
+    let sAjaxType = jLogin.ajaxtype?jLogin.ajaxtype:"post" ;
+    jQuery.ajax( {
+        type     : sAjaxType ,
+        url      : jBID.url_cgi ,
+        async    : true   ,
+        data     : jData  ,
+        headers  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        dataType : "json" ,
+        success  : function(jReturn) {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogin(jReturn.bid_data, null) ;
+
+            // Setting Token ----------
+            if( jReturn.bid_data.user.login == "Y" ) {
+                if( jLogin.keep == "Y" ) {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 1 ) ;
+                    localStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+                else {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 0 ) ;
+                    sessionStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+            }
+            fcLogin(null, jReturn.bid_data.user) ;
+        } ,
+        error    : function(jXHR, sAjaxStatus, eThrown) {
+            let jEresult = {
+                err_code  : "login:error" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogin( jEresult, null ) ;
+        }
+    });
+} ;
+
+bidengine.logout = (jBID, fcLogout = () => {} ) => {
+    let jData   = {
+        bid_module    : "module:bid.base:util:tokenauth" ,
+        bid_proccode  : "logout" ,
+        bid_datatype  : "json"
+    } ;
+    $.ajax( {
+        type    : "get" ,
+        url     : jBID.url_cgi  ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID,  bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogout(jReturn.bid_data, null) ;
+            bidengine.inittoken( jBID ) ;
+            return fcLogout(null, jReturn.bid_data) ;
+        } ,
+        error   : (jXHR, sAjaxStatus, eThrown) => {
+            let eRresult = {
+                "err_code"  : "logout:error" ,
+                "err_msg"   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                "_response" : jXHR.responseText
+            } ;
+            return fcLogout(eRresult) ;
+        }
+    }) ;
+} ;
+
+bidengine.alllogout   = (jBID, fcAllLogout) => {
+    if( typeof(fcAllLogout) != "function" ) fcAllLogout = function(){} ;
+    let sUrl    = jBID.url_cgi ;
+
+    let jData   = {
+        bid_module    : "module:bid.base:util:tokenauth" ,
+        bid_proccode  : "alllogout" ,
+        bid_datatype  : "json"
+    } ;
+
+    $.ajax( {
+        type    : "get" ,
+        url     : sUrl  ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID,  bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : function(jReturn) {
+            if( jReturn.bid_state.state == "error" ) {
+                fcAllLogout(jReturn.bid_data, null) ;
+                return ;
+            }
+            bidengine.inittoken( jBID ) ;
+            fcAllLogout( null , true ) ;
+        } ,
+        error   : function(jXHR, sAjaxStatus, eThrown) {
+            let jEresult = {
+                err_code  : "logout:error" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcAllLogout( jEresult, null ) ;
+        }
+    }) ;
+} ;
+
+bidengine.logstate = ( jBID, fcLogState ) => {
+    if( typeof(fcLogState) != "function" ) fcLogState = function(){} ;
+
+    // Token 이 없으면,
+    let iKeep  = localStorage.getItem("bid.keep:" + jBID.site_id) ;
+    let sToken = ( iKeep > 0 )?localStorage.getItem("bid.token:" + jBID.site_id):sessionStorage.getItem("bid.token:" + jBID.site_id) ;
+
+    // app_id 처리
+    let sAppId = (window.bidapp)?window.bidapp.app_id:"" ;
+
+    let jData   = {
+        "bid_module"   : "module:bid.base:util:tokenauth" ,
+        "bid_proccode" : "logstate" ,
+        "bid_datatype" : "json" ,
+        "app_id" : sAppId
+    } ;
+
+    jQuery.ajax( {
+        type    : "get" ,
+        url     : jBID.url_cgi ,
+        async   : true  ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : (jReturn) => {
+            if( jReturn.bid_state.state == "error" ) {
+                bidengine.inittoken(jBID) ;
+                return fcLogState(jReturn.bid_data, null) ;
+            }
+            fcLogState( null, jReturn.bid_data.user, jReturn.bid_data.optauth ) ;
+        } ,
+        error   : (jXHR, sAjaxStatus, eThrown) => {
+            bidengine.inittoken(jBID) ;
+            let jEresult = {
+                err_code  : "logstate:error" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogState( jEresult, null ) ;
+        }
+    });
+} ;
+
+bidengine.logswitch = ( jBID, jLogSwitch, fcLogSwitch ) => {
+    let sKeep = localStorage.getItem("bid.keep:"  + jBID.site_id) ;
+    jLogSwitch.keep = ( sKeep == "1")?"Y":"N" ;
+    let jData = {
+        "bid_module"    : "module:bid.base:util:tokenauth" ,
+        "bid_proccode"  : "logswitch" ,
+        "bid_datatype"  : "json"  ,
+
+        "switch_user" : jLogSwitch.switch_user ,
+        "org_id"      : jLogSwitch.org_id  ,
+        "keep"        : jLogSwitch.keep    ,
+        "auth_type"   : jLogSwitch.auth_type
+    } ;
+    let sAjaxType = jLogSwitch.ajaxtype?jLogSwitch.ajaxtype:"post" ;
+
+    jQuery.ajax( {
+        "type"   : sAjaxType ,
+        "url"    : jBID.url_cgi  ,
+        "async"  : true   ,
+        "data"   : jData  ,
+        "headers"  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        "dataType" : "json" ,
+        "success"  : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogSwitch(jReturn.bid_data, null) ;
+
+            // Setting Token ----------
+            if( jReturn.bid_data.user.login == "Y" ) {
+                if( jLogSwitch.keep == "Y" ) {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 1 ) ;
+                    localStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+                else {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 0 ) ;
+                    sessionStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+            }
+            // Setting urlback --
+            localStorage.setItem("bid.url_afterrevert:" + jBID.site_id, window.location.href ) ;
+            fcLogSwitch(null, jReturn.bid_data.user) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                err_code  : sAjaxStatus + "@bidengine.logswitch" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogSwitch( eResult, null ) ;
+        }
+    });
+} ;
+
+bidengine.logrevert = ( jBID, jLogRevert, fcLogRevert ) => {
+    let sKeep = localStorage.getItem("bid.keep:"  + jBID.site_id) ;
+    jLogRevert.keep = ( sKeep == "1")?"Y":"N" ;
+    let jData = {
+        "bid_module"    : "module:bid.base:util:tokenauth" ,
+        "bid_proccode"  : "logrevert" ,
+        "bid_datatype"  : "json"  ,
+
+        "keep"        : jLogRevert.keep    ,
+        "auth_type"   : jLogRevert.auth_type
+    } ;
+    let sAjaxType = jLogRevert.ajaxtype?jLogRevert.ajaxtype:"post" ;
+
+    jQuery.ajax( {
+        "type"   : sAjaxType ,
+        "url"    : jBID.url_cgi  ,
+        "async"  : true   ,
+        "data"   : jData  ,
+        "headers"  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        "dataType" : "json" ,
+        "success"  : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogRevert(jReturn.bid_data, null) ;
+
+            // Setting Token ----------
+            if( jReturn.bid_data.user.login == "Y" ) {
+                if( jLogRevert.keep == "Y" ) {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 1 ) ;
+                    localStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+                else {
+                    localStorage.setItem("bid.keep:"  + jBID.site_id, 0 ) ;
+                    sessionStorage.setItem("bid.token:" + jBID.site_id, jReturn.bid_data.token ) ;
+                }
+                jReturn.bid_data.user.url_afterrevert = localStorage.getItem("bid.url_afterrevert:" + jBID.site_id) ;
+                localStorage.removeItem("bid.url_afterrevert:" + jBID.site_id) ;
+            }
+            fcLogRevert(null, jReturn.bid_data.user) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                err_code  : sAjaxStatus + "@bidengine.logswitch" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogRevert( eResult, null ) ;
+        }
+    });
+} ;
+
+/*---- Bid Certification New Library : 6 개 ----
+1. bidengine.login ( jBID, jLogin, fnCallback) : 회원로그인
+    jBID : BID Configuration
+    jLogin : user_id, user_pw, keep = true / false
+    fnCallback : Callback Function ( jError, UserInfo)
+2. bidengine.logout ( jBID, fnCallback) : 회원로그아웃
+    jBID : BID Configuration
+    fnCallback : Callback Function ( jError, True / False )
+3. bideigne.logstate ( jBID, fnCallback) : 회원현재 상황 확인
+    jBID : BID Configuration
+    fnCallback : Callback Function ( jError, UserInfo )
+4. bidengine.logswitch( jBID, jLogSwitch, fcLogSwitch)
+    jLogSwitch : switch_user
+-------------------------------------*/
+bidengine.fpLogin = ( jBID, jLogin = {}, fcLogin = ()=>{} ) => {
+    let jData   = {
+        bid_module    : "class:bid.base:util:sysauth" ,
+        bid_proccode  : "login" ,
+        bid_datatype  : "json"  ,
+
+        user_id   : jLogin.user_id ,
+        user_pw   : jLogin.user_pw ,
+        org_id    : jLogin.org_id  ,
+        keep      : jLogin.keep    ,
+        auth_type : jLogin.auth_type ,
+        sys_key   : jLogin.sys_key
+    } ;
+
+    let sAjaxType = jLogin.ajaxtype?jLogin.ajaxtype:"post" ;
+    jQuery.ajax( {
+        type     : sAjaxType ,
+        url      : jBID.url_cgi  ,
+        async    : true   ,
+        data     : jData  ,
+        headers  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        dataType : "json" ,
+        success  : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogin(jReturn.bid_data, null) ;
+            fcLogin(null, jReturn.bid_data) ;
+        } ,
+        error    : function(jXHR, sAjaxStatus, eThrown) {
+            let jEresult = {
+                err_code  : "login:error" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogin( jEresult, null ) ;
+        }
+    });
+} ;
+
+bidengine.fpLogout = (jBID, jLogOut = {}, fcLogout = ()=>{} ) => {
+    let jData   = {
+        "bid_module"    : "class:bid.base:util:sysauth" ,
+        "bid_proccode"  : "logout" ,
+        "bid_datatype"  : "json" ,
+
+        "sys_key"  : jLogOut.sys_key  ,
+        "all_type" : jLogOut.all_type
+    } ;
+    $.ajax( {
+        type    : "get" ,
+        url     : jBID.url_cgi  ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID,  bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogout(jReturn.bid_data, null) ;
+            return fcLogout(null, jReturn.bid_data) ;
+        } ,
+        error   : (jXHR, sAjaxStatus, eThrown) => {
+            let eRresult = {
+                "err_code"  : "logout:error" ,
+                "err_msg"   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                "_response" : jXHR.responseText
+            } ;
+            return fcLogout(eRresult) ;
+        }
+    }) ;
+} ;
+
+bidengine.fpLogstate = (jBID, jLogstate = {}, fcLogState = ()=>{} ) => {
+    let jData   = {
+        "bid_module"   : "class:bid.base:util:sysauth" ,
+        "bid_proccode" : "logstate" ,
+        "bid_datatype" : "json" ,
+        "sys_key" : jLogstate.sys_key
+    } ;
+
+    jQuery.ajax( {
+        type    : "get" ,
+        url     : jBID.url_cgi ,
+        async   : true  ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogState(jReturn.bid_data, null) ;
+            fcLogState( null, jReturn.bid_data.certinfo ) ;
+        } ,
+        error   : (jXHR, sAjaxStatus, eThrown) => {
+            let jEresult = {
+                "err_code" : "logstate:error" ,
+                "err_msg"  : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                "res_text" : jXHR.responseText
+            } ;
+            fcLogState( jEresult, null ) ;
+        }
+    });
+} ;
+
+bidengine.fpLogswitch = (jBID, jLogSwitch = {}, fcLogSwitch = ()=>{} ) => {
+    let jData = {
+        "bid_module"   : "class:bid.base:util:sysauth" ,
+        "bid_proccode" : "logswitch" ,
+        "bid_datatype" : "json"  ,
+
+        "switch_user"  : jLogSwitch.switch_user ,
+        "org_id"       : jLogSwitch.org_id  ,
+        "keep"         : jLogSwitch.keep?jLogSwitch.keep:"N" ,
+        "auth_type"    : jLogSwitch.auth_type ,
+        "sys_key"      : jLogSwitch.sys_key
+    } ;
+    let sAjaxType = jLogSwitch.ajaxtype?jLogSwitch.ajaxtype:"post" ;
+
+    jQuery.ajax( {
+        "type"   : sAjaxType ,
+        "url"    : jBID.url_cgi  ,
+        "async"  : true   ,
+        "data"   : jData  ,
+        "headers"  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        "dataType" : "json" ,
+        "success"  : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogSwitch(jReturn.bid_data, null) ;
+            // Setting Urlback
+            localStorage.setItem("bid.url_afterrevert:" + jBID.site_id, window.location.href ) ;
+            fcLogSwitch(null, jReturn.bid_data.user) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                err_code  : sAjaxStatus + "@bidengine.logswitch" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogSwitch( eResult, null ) ;
+        }
+    });
+} ;
+
+bidengine.fpLogrevert = ( jBID, jLogRevert = {}, fcLogRevert = ()=>{} ) => {
+    let jData = {
+        "bid_module"    : "class:bid.base:util:sysauth" ,
+        "bid_proccode"  : "logrevert" ,
+        "bid_datatype"  : "json"  ,
+
+        "keep"         : jLogSwitch.keep?jLogSwitch.keep:"N" ,
+        "auth_type"    : jLogSwitch.auth_type ,
+        "sys_key"      : jLogSwitch.sys_key
+    } ;
+
+    let sAjaxType = jLogRevert.ajaxtype?jLogRevert.ajaxtype:"post" ;
+
+    jQuery.ajax( {
+        "type"   : sAjaxType ,
+        "url"    : jBID.url_cgi  ,
+        "async"  : true   ,
+        "data"   : jData  ,
+        "headers"  : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        "dataType" : "json" ,
+        "success"  : (jReturn) => {
+            if( jReturn.bid_state.state == "error" )
+                return fcLogRevert(jReturn.bid_data, null) ;
+            fcLogRevert(null, jReturn.bid_data.user) ;
+        } ,
+        "error" : (jXHR, sAjaxStatus, eThrown) => {
+            let eResult = {
+                err_code  : sAjaxStatus + "@bidengine.logswitch" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fcLogRevert( eResult, null ) ;
+        }
+    });
+} ;
+
+/*----- Bid Certification Extend Library : 6 개 ----
+1. bidengine.makeheader ( jBID, sProcKey, sProcValue) : Http Header Make Function
+    jBID : BID Configuration
+    sProcKey   : Process Key
+    sProcValue : Process Value
+    * Return : JSON { "x-bid-token" : sHeaderValue }
+2. bidengine.inittoken ( jBID ) : Cert Token 초기화
+    jBID : BID Configuration
+3. bidengine.getstatevalue ( jBID , sState_key , fnCallback ) : Key + Value 값 설정
+    jBID : BID Configuration
+    sState_key : 상태 key 값
+    fnCallback : Callback Function ( jError, StateKeyInfo )
+-------*/
+bidengine.makeheadervalue = ( jBID, sProcKey, sProcValue ) => {
+    // -- Site : dev_key setting --
+    let sDev_key = localStorage.getItem("bid.dev_key:" + jBID.site_id)  ;
+    let iKeep    = localStorage.getItem("bid.keep:" + jBID.site_id)     ;
+    if(!sDev_key) {
+        sDev_key = bidengine.uniqid() ;
+        localStorage.setItem("bid.dev_key:" + jBID.site_id, sDev_key)   ;
+    }
+    if(!iKeep) {
+        iKeep = 0 ;
+        localStorage.setItem("bid.keep:" + jBID.site_id, iKeep )  ;
+    }
+    let sToken_type = (jBID.token_type)?jBID.token_type:"default" ;
+    let sToken, sHeaderValue ;
+
+    switch(sToken_type) {
+        case "api" :
+        break ;
+        default : // sHeader Value : Token Type / Device Key / Process Key / Process Value / Token
+            sToken = ( iKeep > 0 )?localStorage.getItem("bid.token:" + jBID.site_id):sessionStorage.getItem("bid.token:" + jBID.site_id) ;
+            sHeaderValue = sToken_type + "|" + sDev_key + "|" + sProcKey + "|" + sProcValue ;
+            if(sToken)
+                sHeaderValue += "|" + sToken ;  // JWT
+        break ;
+    }
+    return sHeaderValue ;
+}
+
+bidengine.makeheader  = ( jBID, sProcKey, sProcValue) => {
+    var sHeaderValue = bidengine.makeheadervalue( jBID, sProcKey, sProcValue ) ;
+    return { "x-bid-token" : sHeaderValue } ;
+} ;
+
+bidengine.inittoken = function( jBID ) {
+    localStorage.removeItem("bid.token:" + jBID.site_id) ;
+    sessionStorage.removeItem("bid.token:" + jBID.site_id) ;
+    localStorage.setItem("bid.keep:" + jBID.site_id, 1 ) ;
+    return ;
+} ;
+
+bidengine.getstatevalue = function( jBID, sState_key, fnCallback ) {
+    if( typeof(fnCallback) != "function" ) fnCallback = function(){} ;
+    let sUrl    = jBID.url_cgi ;
+
+    let jData   = {
+        bid_module    : "module:bid.base:util:tokenauth" ,
+        bid_proccode  : "getstatevalue" ,
+        bid_datatype  : "json" ,
+
+        state_key : sState_key
+    } ;
+
+    // bidengine.clog(jData) ;
+    jQuery.ajax( {
+        type    : "get" ,
+        url     : sUrl  ,
+        async   : true ,
+        data    : jData ,
+        headers : bidengine.makeheader( jBID, bidengine.uniqid(), "" ) ,
+        dataType: "json" ,
+        success : function(jReturn) {
+            if( jReturn.dd4_state.state == "error" ) {
+                fnCallback(jReturn.dd4_data) ;
+                return ;
+            }
+            // -- Get Key --
+            fnCallback( null, jReturn.dd4_data.statevalue ) ;
+        } ,
+        error   : function(jXHR, sAjaxStatus, eThrown) {
+            let jEresult = {
+                err_code  : "logstate:error" ,
+                err_msg   : bidengine.jquery_xhrerror(jXHR, sAjaxStatus, eThrown, false) ,
+                err_data  : jXHR.responseText
+            } ;
+            fnCallback( jEresult, null ) ;
+        }
+    });
+} ;
+
+/* -- Etc Function --
+1. text2html()
+*/
+bidengine.text2html = function( sSrcText, jOptConvert ) {
+    // sSrcText = sSrcText,"") ;
+    let hRtnHtml = sSrcText ;
+    // -- nl2br --
+    hRtnHtml = hRtnHtml.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+
+    // -- " " -> &nbsp;
+    hRtnHtml = hRtnHtml.replace(/ /gi , "&nbsp;" ) ;
+    hRtnHtml = hRtnHtml.replace(/\t/gi, "&nbsp;&nbsp;&nbsp;&nbsp;" ) ;
+
+    // -- "<", ">" -> &lt; , &gt;
+    // hRtnHtml = hRtnHtml.replace(/</gi, "&lt;" ) ;
+    // hRtnHtml = hRtnHtml.replace(/>/gi, "&gt;" ) ;
+
+    return hRtnHtml ;
+} ;
+
+bidengine.fnGetPlatform = () => {
+    let sPlatForm = window.navigator.platform?window.navigator.platform:window.navigator.userAgentData.platform ;
+    if (sPlatForm.toLowerCase().includes('win')) {
+        return "win" ;
+    } else if (sPlatForm.toLowerCase().includes('mac')) {
+        return "mac" ;
+    } else if (sPlatForm.toLowerCase().includes('linux')) {
+        return "linux" ;
+    } else if (sPlatForm.toLowerCase().includes('iphone') || sPlatForm.toLowerCase().includes('ipad') || sPlatForm.toLowerCase().includes('ipod')) {
+        return "ios" ;
+    } else if (sPlatForm.toLowerCase().includes('android')) {
+        return "android" ;
+    } else {
+        return null ;
+    }
+} ;
+
+bidengine.fgTextColorByBackgroundColor = (sHexColor) => {
+    const c = sHexColor.substring(1) // 색상 앞의 # 제거
+    const rgb = parseInt(c, 16)      // rrggbb를 10진수로 변환
+    const r = (rgb >> 16) & 0xff     // red 추출
+    const g = (rgb >>  8) & 0xff     // green 추출
+    const b = (rgb >>  0) & 0xff     // blue 추출
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b // per ITU-R BT.709
+    // 색상 선택
+    return luma < 127.5 ? "white" : "black" // 글자색이
+}
+
+bidengine.frSetOverlayTarget = ( $Target, sActCode ) => {
+    /*  Setting CSS
+        1. overflow : hidden
+        2. position : absolue, relative, fix
+        3. padding-left, padding-bottom : ScrollBar 때문..
+    */
+    let $CurTarget   = $Target?$Target:$("body") ;
+    let sCurOverflow ;
+    switch(sActCode) {
+        case "showoverlay" :
+            sCurOverflow = $CurTarget[0].style.overflow ;
+            $CurTarget.data("bid-prev-overflow", sCurOverflow) ;
+            $CurTarget[0].style.overflow = "hidden" ;
+        break ;
+        case "hideoverlay" :
+            sResOverflow = $CurTarget.data('bid-prev-overflow') ; //  [핵심] 저장해두었던 이전 값을 가져옴 (없다면 기본값 auto)
+            $CurTarget[0].style.overflow = sResOverflow ;
+        break ;
+        default :
+
+        break ;
+    }
+    return $CurTarget ;
+} ;
+/*-- Cookie Library : 4 개 --
+1. bidengine.fnGetCookie() : Cookie 를 가지고 온다.
+2. bidengine.fnSetCookie() : Cookie 를 설정한다.
+3. bidengine.fnDeleteCookie() : Cookie 를 삭제한다.
+4. bidengine.fnDeleteAllCookie() : 전체 Cookie 를 삭제한다.
+--*/
+bidengine.fnGetCookie = (name) => {
+    let matches = document.cookie.match(new RegExp(
+      "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+} ;
+
+bidengine.fnSetCookie = ( name, value, options = {}) => {
+    options.path = options.path?options.path:"/" ;  // 경로지정
+
+    if (options.expires instanceof Date) {
+        options.expires = options.expires.toUTCString(); // 생 Date 객체라면 형식에 맞게 인코딩
+    }
+
+    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) ;
+
+    for (let optionKey in options) {
+        updatedCookie += "; " + optionKey;
+        let optionValue = options[optionKey];
+        if (optionValue !== true) { // 밸류가 없다면
+            updatedCookie += "=" + optionValue;
+        }
+    }
+
+    document.cookie = updatedCookie; // 새로 갱신
+} ;
+
+bidengine.fnDeleteCookie = (name) => { // 해당 쿠키 요소만 삭제
+    bidengine.fnSetCookie(name, "", {
+      'max-age': -1
+    })
+} ;
+
+bidengine.fnDeleteAllCookies = () => {
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++) {
+       var cookie = cookies[i] ;
+       var eqPos = cookie.indexOf("=");
+       var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+       bidengine.fnDeleteCookie( name.trim() ) ;
+    }
+} ;
+
+bidengine.fnHistoryPushState = ( sEvtCode, jUrlParam, jEvtData = {} ) => {
+    let jUrlSelf   = new URL(window.location.href) ;
+    let jUrlParams = jUrlSelf.searchParams ;
+    for ( const [sKey, sValue] of Object.entries(jUrlParam)) {
+        if(!sValue)
+            jUrlParams.delete(sKey) ;
+        else
+            jUrlParams.set(sKey, sValue) ;
+    }
+    jEvtData.evt_code = sEvtCode ;
+    jEvtData.bid_act  = "pushstate" ;
+    history.pushState(jEvtData, "", jUrlSelf.toString()) ;
+    $("[bid-listener='body']").trigger("bid-event", jEvtData) ;
+} ;
+
+
+/*-- AddOn jQuery PlugIn Function ; 4개 --
+1. $.fn.serializeObject : Form Tag의 데이타 확인 Return 하는 값을 console.log() 로 확인이 가능하다.
+2. $.fn.serializeFiles  : Form Tag의 데이타 & File 확인 Return 하는 값을 console.log() 로 확인이 불가하다.
+3. $.unparam : "bidengine.upparam" 의 확장판
+4. $(document).ajaxSuccess : Ajax Success Global Setting
+--*/
+(function($) {
+    $.fn.serializeObject = function() { var obj = null; try { if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) { var arr = this.serializeArray(); if(arr){ obj = {}; jQuery.each(arr, function() { obj[this.name] = this.value; }); } } }catch(e) { alert(e.message); }finally {} return obj; }
+    $.fn.serializeFiles  = function() {
+        var $Form = $(this),
+            oFormData   = new FormData() ,
+            aFormParams = $Form.serializeArray() ;
+
+        $.each($Form.find('input[type="file"]'), function(i, tag) {
+            $.each($(tag)[0].files, function(i, file) {
+                oFormData.append(tag.name, file);
+            } ) ;
+        } ) ;
+
+        $.each(aFormParams, function(i, jVal) {
+            oFormData.append( jVal.name, jVal.value) ;
+        });
+        return oFormData ;
+    } ;
+    $.unparam = function(input) {
+		var items, temp,
+    		// Expresiones regulares
+			expBrackets = /\[(.*?)\]/g,
+			expVarname = /(.+?)\[/,
+    		// Contenedor para almacenar el resultado
+			result = {} ;
+
+        // Descartamos entradas que no sean cadenas de texto o se encuentren vacías
+		if ((temp = $.type(input)) != 'string' || (temp == 'string' && !temp.length))
+			return {} ;
+
+        // Decodificamos la entrada y la dividimos en bloques
+		items = decodeURIComponent(input).split('&') ;
+
+		// Es necesario que los datos anteriores no se encuentren vacíos
+		if (!(temp = items.length) || (temp == 1 && temp === ''))
+			return result;
+
+		// Recorremos los datos
+		$.each(items, function(index, item) {
+			// Es necesario que no se encuentre vacío
+			if (!item.length)
+				return;
+			// Iniciamos la divisón por el caracter =
+			temp = item.split('=');
+			// Obtenemos el nombre de la variable
+			var key = temp.shift(),
+			// Y su valor
+				value = temp.join('=').replace(/\+/g, ' '),
+				size, link, subitems = [];
+			// Es necesario que el nombre de la clave no se encuentre vacío
+			if (!key.length)
+				return;
+			// Comprobamos si el nombre de la clave tiene anidaciones
+			while((temp = expBrackets.exec(key)))
+				subitems.push(temp[1]);
+
+			// Si no tiene anidaciones
+			if (!(size = subitems.length)) {
+				// Guardamos el resultado directamente
+				result[key] = value;
+				// Continuamos con el siguiente dato
+				return;
+			}
+			// Decrementamos el tamaño de las anidaciones para evitar repetidas restas
+			size--;
+			// Obtenemos el nombre real de la clave con anidaciones
+			temp = expVarname.exec(key);
+			// Es necesario que se encuentre y que no esté vacío
+			if (!temp || !(key = temp[1]) || !key.length)
+				return;
+
+			// Al estar todo correcto, comprobamos si el contenedor resultante es un objecto
+			if ($.type(result[key]) != 'object')
+				// Si no lo es forzamos a que lo sea
+				result[key] = {};
+
+			// Creamos un enlace hacia el contenedor para poder reccorrerlo a lo largo de la anidación
+			link = result[key];
+			// Recorremos los valores de la anidación
+			$.each(subitems, function(subindex, subitem) {
+				// Si el nombre de la clave se encuentra vacío (varname[])
+				if (!(temp = subitem).length) {
+					temp = 0;
+					// Recorremos el enlace actual
+					$.each(link, function(num) {
+						// Si el índice es un número entero, positivo y mayor o igual que el anterior
+						if (!isNaN(num) && num >= 0 && (num%1 === 0) && num >= temp)
+							// Guardamos dicho número y lo incrementamos en uno
+							temp = Number(num)+1;
+					});
+				}
+				// Si se llegó al final de la anidación
+				if (subindex == size) {
+					// Establecemos el valor en el enlace
+					link[temp] = value;
+				} else if ($.type(link[temp]) != 'object') { // Si la anidación no existe
+					// Se crea un objeto con su respectivo enlace
+					link = link[temp] = {};
+				} else { // Si la anidación existe
+					// Cambiamos el enlace sin sobreescribir datos
+					link = link[temp];
+				}
+			});
+		});
+		// Retornamos el resultado en forma de objeto
+		return result ;
+	} ;
+    $("body").on("bid-event.body",( jEvtSelf, jEvtData ) => {
+        let $BodyListener = $("[bid-interact='bodylistener']") ;
+        for( let i = 0 ; i < $BodyListener.length ; i ++ ) {
+            $($BodyListener[i]).trigger("bid-event", jEvtData) ;
+        }
+    }) ;
+    $(document).ajaxStart( (jEvtAjax) => {
+        // console.log("### Global AjaxStart ###") ;
+        // console.log(jEvtAjax) ;
+    }) ;
+    $(document).ajaxStop( (jEvtAjax) => {
+        //console.log("$$$ Global AjaxStop $$$");
+        // console.log(jEvtAjax) ;
+    }) ;
+    $(document).ajaxSend( (jEvent, jXhr, jSettings) => {
+        //console.log("@@@ Global AjaxSend @@@");
+        // console.log(jEvent) ;
+        // console.log(jXhr) ;
+        // console.log(jSettings.url) ;
+    }) ;
+    $(document).ajaxSuccess((jEvent, jXhr, jSettings) => {
+        // console.log("!!! Global AjaxSuccess !!!") ;
+        // console.log(jSettings.url) ;
+        // console.log(jEvent) ;
+        // console.log(jXhr) ;
+        // console.log(jSettings) ;
+    }) ;
+})(jQuery) ;
+
+window.addEventListener('popstate', (jEvtPopState) => {
+    if( jEvtPopState.state ) {
+        let jEvtData = JSON.parse(JSON.stringify(jEvtPopState.state)) ;
+        jEvtData.bid_act = "popstate" ;
+        $("[bid-listener='body']").trigger("bid-event", jEvtData) ;
+    }
+}) ;
+
+/* TouchEvent 가 있는지 없는지 확인 */
+bidengine.isTouchEvent = false ;
+
+// 1. 터치 시작 시 플래그 설정
+document.addEventListener('touchstart', () => {
+    bidengine.isTouchEvent = true;
+}, { passive: true }) ;
+
+// 2. 마우스가 움직이거나 클릭할 때는 플래그 해제
+document.addEventListener('mousedown', () => {
+    bidengine.isTouchEvent = false;
+}, { passive: true }) ;
+
+// 3. 컨텍스트 메뉴가 뜰 때, 터치로 인한 발생이면 차단
+document.addEventListener('contextmenu', (e) => {
+    if (bidengine.isTouchEvent) {
+        e.preventDefault(); // 화면 터치로 인한 메뉴 팝업만 차단!
+        isTouchEvent = false; // 플래그 초기화
+    }
+}, { passive: false }) ;

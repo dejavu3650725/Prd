@@ -1,0 +1,147 @@
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-user-name {
+    white-space : nowrap ;
+    text-align  : left ;
+    font-family : NanumSquare ;
+    font-style  : normal ;
+    font-weight : bold ;
+    font-size   : 1.3rem ;
+    color: rgba(75,75,75,1) ;
+    margin-top  : 0.2rem ;
+}
+
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-user-id {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.2rem ;
+    color: rgba(128,128,128,1);
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-user-state {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1rem;
+    color: rgba(191,190,190,1);
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-versubtitle {
+    font-style  : normal ;
+    font-weight : normal ;
+    font-family : NanumSquare ;
+    font-size   : 1.4rem ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-msg-usenormal, .bid-msg-usevideo {
+    white-space: nowrap;
+    text-align: left;
+    font-family: Noto Sans Korean;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1rem ;
+    color: rgba(75,75,75,1);
+}
+
+/*-- Status Data --*/
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-vertitle {
+    text-align: left ;
+    font-family: NanumSquare ;
+    font-style: normal ;
+    font-weight: bold ;
+    font-size: 1.4rem ;
+    letter-spacing: -0.3px ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-versubtitle {
+    text-align: left ;
+    font-family: NanumSquare ;
+    font-style: normal ;
+    font-weight: bold ;
+    font-size: 1.1rem ;
+    letter-spacing: -0.3px ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-orgtitle {
+    text-align: left ;
+    font-family: NanumSquare ;
+    font-style: normal ;
+    font-weight: bold ;
+    font-size: 1.1rem ;
+    letter-spacing: -0.3px ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-orgsubtitle {
+    text-align: left ;
+    font-style: normal ;
+    font-size: 0.9rem ;
+    letter-spacing: -0.3px ;
+}
+
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-msgtitle {
+    text-align: left ;
+    font-family: NanumSquare ;
+    font-style: normal ;
+    font-weight: bold ;
+    font-size: 1.1rem ;
+    letter-spacing: -0.3px ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-msgsubtitle {
+    text-align: left ;
+    font-style: normal ;
+    font-size: 0.9rem ;
+    letter-spacing: -0.3px ;
+}
+
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-orgstatus-listdata {
+    display:flex;
+    justify-content: space-around ;
+    align-items: center ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-orgstatus-eachdata {
+    width : 70px ;
+    text-align : center ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-orgstatus-eachdata-title {
+    font-size : 0.8rem ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-orgstatus-eachdata-circle {
+    width  : 70px ;
+    height : 70px ;
+    border-radius : 50% ;
+    background-color: #ffffff ;
+    background-color: rgba( 255, 255, 255, 0.4 ) ;
+    display:flex;
+    justify-content: center ;
+    align-items: center ;
+    font-family: Noto Sans Korean ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.user:block.sideuser']
+.bid-section-orgstatus-progressbar-pointtext {
+    text-align: left ;
+    font-family: NanumSquare ;
+    font-style: normal ;
+    font-weight: bold ;
+    font-size: 1.1rem ;
+    letter-spacing: -0.3px ;
+}

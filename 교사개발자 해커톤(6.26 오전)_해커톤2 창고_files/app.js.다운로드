@@ -1,0 +1,52 @@
+/* -- Setting BID Configuration : APP & Config URL --
+1. window.bidapp
+    sys_key    : System Key
+    sys_bidapp : System APP 진입 URL
+    sys_title  : System Title
+
+1. window.bid
+    cfgjsonurl : 페이지 전체에 적용되는 Configuration URL
+*/
+if (document.location.protocol == 'http:') {
+    document.location.href = document.location.href.replace('http:', 'https:') ;
+    exit(0);
+}
+
+// "wowidea.co.kr"로 접근금지
+if (document.location.hostname == "wowideas.co.kr" ) {
+    document.location.href = document.location.href.replace(document.location.hostname, "www.wowideas.co.kr" ) ;
+    exit(0) ;
+}
+
+window.bidapp = {
+    "sys_key"     : "cwinfo.wowideas" ,
+    "sys_bidapp"  : "cwinfo.wowideas/index.html" ,
+    "sys_title"   : "Wow Ideas"
+} ;
+
+window.bid = {
+    "cfgjsonurl"  : window.location.origin + "/bid_config/config.json?_bid=" + new Date().getTime()
+} ;
+
+// -- /Setting BID Configuration --
+$(function() {
+    if( window.cordova )
+        document.addEventListener("deviceready", function(){
+            let bConnect = true ;
+            if( navigator.connection ) {
+                bConnect = ( Connection.NONE == navigator.connection.type )?false:true ;
+                if(!bConnect) {
+                    alert("Connect Error!!\nYou have no internet connection.") ;
+                    navigator.app.exitApp() ;
+                    return ;
+                }
+            }
+            InitEngine() ;
+        } , false) ;
+    else
+        InitEngine() ;
+}) ;
+
+function InitEngine() {
+    window.bidengine.setengine(RunPage) ;
+}

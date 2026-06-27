@@ -1,0 +1,327 @@
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-mainblock {
+    display    : block ;
+    min-height : 100%  ;
+}
+
+/* -- Canvas Space --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-cover-canvas {
+    position  : absolute ;
+    top       : 70px ;
+    bottom    : 0px  ;
+    left      : 0px  ;
+    right     : 0px  ;
+    overflow  : hidden ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-canvas {
+    position  : absolute ;
+    top       : 0px ;
+    bottom    : 0px  ;
+    left      : 0px  ;
+    right     : 0px  ;
+    padding   : 0px 25px 25px 25px ;
+    overflow  : scroll ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-canvas::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-canvas::-webkit-scrollbar-thumb {
+    background-color: #B0B0B0;
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-canvas::-webkit-scrollbar-track {
+    background-color: #E0E0E0;
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 3px white;
+}
+
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-section-additem {
+    position : absolute ;
+    top      : 10px  ;
+    left     : 10px  ;
+    width    : 260px ;
+    z-index  : 900 ;
+}
+
+/* -- draw2d canvas --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-canvas {
+    width  : 4000px ;
+    height : 4000px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-canvas.bid-addfigure {
+    cursor : crosshair !important ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-canvas.bid-panningcanvas {
+    cursor : grab !important ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-canvas.bid-panningcanvas rect {
+    cursor : default !important ;
+}
+
+/* -- Canvas ToolBar --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-toolbarcanvas {
+    position : absolute ;
+    top      : 90px ;
+    width    : 50px ;
+    left     : 7px  ;
+    z-index  : 991  ;
+    line-height : 1 ;
+
+    .bid-sect-toolbarcanvas {
+        display : flex;
+        flex-direction: column ;
+        gap : 8px ;
+    }
+
+    .bid-item-toolbarcanvas {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width  : 36px;
+        height : 36px;
+        background-color: #ffffff ;
+        color : #2c2c2c ;
+        border-radius : 50%;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 4px, rgba(0, 0, 0, 0.24) 0px 2px 4px ;
+        cursor : pointer ;
+        border: 2px solid transparent ;
+    }
+
+    .bid-item-toolbarcanvas.bid-action {
+        background-color: #E1E1E1 ;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 4px, rgba(0, 0, 0, 0.24) 0px 2px 4px ;
+        border: 2px solid #A2A2A2 ;
+    }
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-covericon-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width  : 24px;
+    height : 24px;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-itemicon-toolbar {
+    font-size : 24px ;
+}
+
+
+/* -- Canvas - formatbox --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-formatbox {
+    position : absolute ;
+    top      : 10px  ;
+    right    : 20px  ;
+    z-index  : 999   ;
+    border   : 1px solid transparent ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-icon {
+    font-family: 'Noto Sans KR', sans-serif ;
+    width      : 220px ;
+    display    : none  ;
+}
+
+/* Start .bid-sect-formatbox-card */
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card {
+    font-family: 'Noto Sans KR', sans-serif ;
+    width  : 220px ;
+    height : 100%  ;
+    .bid-row-eachprop {
+        display : flex ;
+        align-items : center ;
+        margin-bottom : 0.3rem ;
+        .bid-col-label {
+            flex : 0 0 70px ;
+            font-size : 0.8rem ;
+            font-weight : 500 ;
+        }
+        .bid-col-input {
+            flex : 1 1 100px ;
+        }
+    }
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-body {
+    display:none ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer {
+    display:none ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer [bid-routine-format] {
+    padding : 0.3rem 0.3rem ;
+    cursor  : pointer ;
+    color   : #6B757D ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer [bid-routine-format='savefrontfigure']:hover {
+    color   : #1BA345 ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer [bid-routine-format='savebackfigure']:hover {
+    color   : #1BA345 ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer [bid-routine-format='deletefigure']:hover {
+    color   : #DE3E44 ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-formatbox-card .card-footer [bid-routine-format='saveformatfigure']:hover {
+    color   : #0081FF ;
+}
+
+
+/* bid-routine-format="savefrontfigure" */
+
+
+/*-- Shape Icon을 변환하기 위한 Click --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-sect-listshape-changeaddshape .bid-item-changeaddshape {
+    line-height : 1 ;
+    padding : 0.25rem ;
+    border-radius : 0.25rem ;
+    border : 1px solid white ;
+    background-color: transparent ;
+    cursor : pointer ;
+}
+
+/*-- Figure TextArea --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+textarea.bid-foreignObject-textarea {
+    opacity     : 1 ;
+    font-size   : 44px ;
+    line-height : 52px ;
+    white-space : pre-wrap ;
+    text-align  : left ;
+    width  : 100% ;
+    height : 100% ;
+    resize : none
+}
+
+
+/* -- ViewControl ToolBar --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-toolbarview {
+    position : absolute ;
+    top   : 230px ;
+    left  : 0px ;
+    width : 50px ;
+
+    z-index : 991 ;
+    line-height:1 ;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    background-color : #F0F2F5 ;
+    border-radius : 0% 25px 25px 0% ;
+    box-shadow : rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px ;
+
+    .bid-sect-toolbartoggle {
+        height  : 50px ;
+        padding : 7px  ;
+        background-color: #EBECEE ;
+        border-radius: 0% 25px 25px 0%;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    }
+
+    .bid-sect-toolbarview {
+        max-height : 0 ;
+        overflow   : hidden ;
+        /* transition : max-height 0.5s ease */
+        padding    : 0px 7px 0px 7px ;
+    }
+
+    .bid-item-toolbarview {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width  : 36px;
+        height : 36px;
+        background-color: #ffffff ;
+        color : #2c2c2c ;
+        border-radius : 50%;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 4px, rgba(0, 0, 0, 0.24) 0px 2px 4px ;
+        cursor : pointer ;
+        border: 2px solid transparent ;
+    }
+
+    .bid-item-toolbarview:hover {
+        background-color : #EEEEEE ;
+        box-shadow : rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px ;
+        border : 2px solid transparent ;
+    }
+
+    .bid-covericon-toolbar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width  : 24px ;
+        height : 24px ;
+    }
+
+    .bid-itemicon-toolbar {
+        font-size : 24px ;
+    }
+
+    .bid-covericon-toolbar-toggle {
+        transition: transform 0.5s ease ; /* 부드럽게 회전 */
+    }
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.space2:block.ws_draw2d.v2"]
+.bid-frame-toolbarview.bid-show {
+    .bid-sect-toolbarview {
+        max-height : 300px; /* 충분한 값으로 지정 */
+        padding : 10px 7px 10px 7px ;
+        display : flex ;
+        flex-direction: column ;
+        gap : 8px ;
+    }
+
+    .bid-covericon-toolbar-toggle {
+        transform: rotate(180deg) ;
+    }
+}

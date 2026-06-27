@@ -1,0 +1,24 @@
+[data-bid-module='class:cwinfo.wowideas:bs4.prjmain:part.lastitem']
+.bid-cover-showpart1 {
+    max-width        : 100% ;
+    background-color :#FFFFFF ;
+    color    : #080808 ;
+    border-radius : 20px ;
+    padding       : 20px 20px ;
+    font-family   : 'Noto Sans KR', sans-serif ;
+    box-shadow    : 2px 3px 3px 3px #D1D1D1 ;
+}
+
+[data-bid-module='class:cwinfo.wowideas:bs4.prjmain:part.lastitem']
+.bid-list-lastitems {
+    display : flex ;
+    flex-wrap : nowrap ;
+    overflow-x  : scroll ;
+    overflow-y  : hidden ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:part.lastitem"]
+.bid-list-lastitems::-webkit-scrollbar { width: 8px; height: 8px }
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjmain:part.lastitem"]
+.bid-list-lastitems::-webkit-scrollbar-thumb { background-color: rgba( 0, 0, 0, 0.3) ; border-radius: 10px ; }

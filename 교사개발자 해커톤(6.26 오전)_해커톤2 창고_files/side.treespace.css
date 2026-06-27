@@ -1,0 +1,688 @@
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"] {
+    container-name : bid-663ac947a1ad1 ;
+    container-type : inline-size ;
+    background-color : transparent ;
+
+    /*-- Html 본체 --*/
+    font-family : 'Noto Sans KR', sans-serif ;
+
+}
+
+/*-- 일반적인 기본 사항 --*/
+@container bid-663ac947a1ad1 ( width > 0px ) {
+    .bid-flexitem-header-title-toolbar {
+        padding : 0.3rem 0.5rem 0.3rem 0.8rem ;
+        height  : 50px ;
+        color   : #CBCBCB ;
+        display: flex ;
+        justify-content: space-between ;
+        align-items : center ;
+    }
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"] {
+    height : 100%    ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid_view='main'] {
+    height : 100%  ;
+    display : flex   ;
+    flex-direction  : column ;
+    justify-content : flex-start ;
+}
+
+/*-- Main FlexItem --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-header-logo {
+    flex-grow   : 0 ;
+    flex-shrink : 0 ;
+    flex-basis  : 128px ;
+    height : 128px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-header-title {
+    flex-grow   : 0 ;
+    flex-shrink : 0 ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-treespace {
+    flex-grow  : 1000   ;
+    flex-basis : 200px  ;
+    overflow-y : auto   ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-treespace::-webkit-scrollbar { width: 8px; }
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-treespace::-webkit-scrollbar-thumb { background-color: rgba( 255, 255, 255, 0.5) ; border-radius: 10px ; }
+
+
+/*-- Header-Logo --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-header-logo-bgimage {
+    height : 100% ;
+    background-repeat : no-repeat ;
+    background-attachment : scroll ;
+    background-position :center center;
+    background-size : cover ;
+    position : relative ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-header-logo-bgimage-cover {
+    background-position :center center;
+    position : absolute ;
+    top    : 0px ;
+    bottom : 0px ;
+    left   : 0px ;
+    right  : 0px ;
+    background-color: rgba( 0, 0, 0, 0.5 );
+}
+
+/*-- Header Title CSS --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-header-title-main {
+    height  : 66px ;
+    color : #CBCBCB ;
+    box-shadow  : 0px -2px #CBCBCB inset;
+    font-family : NanumSquare,sans-serif;
+    font-size   : 1.4rem ;
+    font-weight : bold ;
+    padding   : 0rem 1rem 0rem 1rem ;
+    line-height : 1 ;
+
+    display   : flex ;
+
+    flex-wrap : wrap ;
+    gap : 0px 10px ;
+    align-items     : center ;
+    justify-content : flex-start ;
+}
+
+/*-- Body Tree Space &Accordian
+--*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navbar-space-leftmenu {
+    border : 0px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navbar-space-leftmenu {
+    border : 0px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu {
+    border : 0px ;
+    padding : 0rem ;
+    background-color : transparent ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-header {
+    border : 0px ;
+    background-color : transparent ;
+    font-family : NanumSquare,sans-serif ;
+    font-size : 0.95rem ;
+    color : #ABABAB ;
+    line-height : 1.0 ;
+    padding : 0rem 0rem 0.2rem 0.5rem ;
+    display : flex ;
+    align-items : center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='false'] .bid-folder-open, .bid-folder-close {
+    display : none ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='true'] .bid-folder-open {
+    display : inline-block ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='true'] .bid-folder-close {
+    display : none ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='false'] .bid-folder-open {
+    display : none ;
+}
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle[bid-children='true'][aria-expanded='false'] .bid-folder-close {
+    display : inline-block ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-handle {
+    flex : 0 0 18px  ;
+    font-size : 13px ;
+    align-items : center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navbar-subspace {
+    padding-left : 0.7rem ;
+    background-color: transparent ;
+}
+
+/*-- NavBar Space Info --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo {
+    flex-grow : 1  ;
+    display   : flex ;
+    align-items : center ;
+    border-top-left-radius    : 20px ;
+    border-bottom-left-radius : 20px ;
+    padding : 8px 0px 8px 0px ;
+
+    background-color : transparent ;
+    color   : #919191 ;
+    font-weight: normal ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo.active {
+    background-color: #F1F1F1 ;
+    color : #011429 ;
+    font-weight: bold ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='ws_icontag'] {
+    flex-grow   : 0  ;
+    line-height : 1  ;
+    align-self  : center ;
+    padding-left  : 5px  ;
+    width : 27px ;
+    position : relative ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='ws_icontag_entermember'] {
+    flex-basis : 17px ;
+    min-width : 17px ;
+    height : 17px ;
+    padding-left  : 0.3em ;
+    padding-right : 0.33em ;
+    font-size : 12px ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='title_def'] {
+    flex-grow   : 1  ;
+    line-height : 1.2 ;
+    align-self  : center ;
+    padding-left  : 5px ;
+    padding-right : 5px ;
+    white-space : normal ;
+    overflow-wrap : break-word ;
+    word-break    : normal  ;
+    font-size : 0.87rem ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-navitem-space-leftmenu .bid-navitem-spaceinfo [bid-data-field='cntitem'] {
+    flex-grow : 0  ;
+    align-self  : center ;
+    padding-right : 10px ;
+}
+
+
+
+/*-- Badge Icon --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-icon-badge] {
+    position:relative
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-icon-badge]:after {
+    background: red ;
+    border-radius: 30px;
+    color: #fff;
+    content: attr(bid-icon-badge);
+    font-size: 9px;
+    font-weight: normal;
+    top: -0.3rem;
+    right: -7px;
+    min-width: 15px;
+    padding: 1px 4px;
+    position: absolute;
+    text-align: center;
+    line-height: 13px
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-icon-badge="0"]:after,
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-icon-badge=""]:after {
+    display: none;
+}
+
+/*-- Left WorkSpace Button --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-btn-left-ctlspace {
+    display : inline-block ;
+    letter-spacing:0rem;
+    border-radius:15px;
+    text-align:center;
+    padding:2px 7px;
+    font-size:14px;
+    font-family:'Noto Sans KR',sans-serif;
+
+    border: 2px solid #BFBEBE ;
+    font-weight : normal ;
+    cursor : pointer ;
+    background-color:#02142A;
+    color:#BFBEBE;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-btn-left-ctlspace:hover {
+    border: 2px solid #B4FFE9 ;
+    background-color : #B4FFE9 ;
+    color : #011429 ;
+}
+
+
+/*-- Left Menu DeskTop Full Tabs --*/
+
+.bid-leftmenu-nav-tabs .nav-item .nav-link {
+    box-shadow: 0px -1px #808080 inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #808080 ;
+}
+
+.bid-leftmenu-nav-tabs .nav-item .nav-link.active {
+    box-shadow  : 0px -4px #CBCBCB inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #CBCBCB ;
+}
+
+/*-- Left Menu List WorkSpace --*/
+.bid-section-leftmenu-full-listspace {
+    padding-left : 0.751rem
+}
+
+.bid-section-leftmenu-full-listspace .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+}
+
+.bid-section-leftmenu-full-listspace .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Left Menu List WorkSystem --*/
+.bid-section-leftmenu-full-listsystem {
+    padding-left : 0.751rem
+}
+
+.bid-section-leftmenu-full-listsystem .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+}
+
+.bid-section-leftmenu-full-listsystem .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Left Menu DeskTop Mini Tabs --
+--*/
+.bid-leftmenu-mini .bid-leftmenu-tabs {
+    box-shadow: 0px -1px #808080 inset ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.20rem ;
+    font-weight : bold ;
+    color  : #808080 ;
+    padding: .5rem 1rem ;
+    text-align : center ;
+}
+
+.bid-section-leftmenu-mini-listspace {
+    padding-left : 1.25rem ;
+}
+
+.bid-section-leftmenu-mini-listspace .nav-item .nav-link{
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.05rem ;
+    color  : #808080 ;
+    line-height : 1.5 ;
+    text-align : left ;
+}
+
+.bid-section-leftmenu-mini-listspace .nav-item .nav-link.active{
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    color  : #011429 ;
+    background-color : #F1F1F1 ;
+    border-top-left-radius: 1rem ;
+    border-bottom-left-radius: 1rem ;
+}
+
+/*-- Right Menu Chatting  --
+--*/
+.split, .gutter.gutter-horizontal {
+    float: left ;
+    height: 100% ;
+}
+
+.gutter {
+    background-color: gray ;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+.gutter.gutter-horizontal {
+    cursor : ew-resize ;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}
+
+
+
+/*-- Image Logo & Contents --
+    Header : .bid-background-image-logo
+--*/
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo .bid-background-image-logo-cover {
+    background-position :center center;
+    position : absolute ;
+    bottom : 0px ;
+    padding : 0 3rem 30px 3rem;
+    left   : 0px ;
+    right  : 0px ;
+    background : rgb(2,0,36) ;
+    background : linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(44,45,45,0.5861695019804797) 60%, rgba(249,249,249,0) 100%) ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo .bid-btn-callmodal-invite {
+    font-size : 2.5rem ;
+    cursor : pointer ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo [data-bid-element='title_def'] {
+    font-family : NanumSquare,sans-serif ;
+    font-weight : bold ;
+    font-size   : 2.5rem ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo [data-bid-element='cntitem'],[data-bid-element='acc_hit'] {
+    font-family : Segoe UI,sans-serif ;
+    font-weight : bold ;
+    font-size   : 1.7rem ;
+    color : #FFFFFF
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo [data-bid-element='url_mgricon'] {
+    width  : 48px ;
+    height : 48px ;
+    border : 1px solid #dee2e6 ;
+    margin-right : 8px ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-background-image-logo [data-bid-element='mgr_name'] {
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 1.3rem ;
+    color : #DFDFDF ;
+}
+
+/*-- DeskTop Left List member --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-callblock-itemmem {
+    cursor : pointer ;
+}
+
+
+@media (max-width: 600px) {
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo .bid-background-image-logo-cover {
+        padding : 0 1.3rem 15px 1.3rem;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo .bid-btn-callmodal-invite {
+        font-size : 2rem ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo [data-bid-element='title_def'] {
+        font-family : NanumSquare,sans-serif ;
+        font-weight : bold ;
+        font-size   : 1.6rem ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo [data-bid-element='cntitem'],[data-bid-element='acc_hit'] {
+        font-family : Segoe UI,sans-serif ;
+        font-weight : bold ;
+        font-size   : 1.5rem ;
+        color : #FFFFFF
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo [data-bid-element='url_mgricon'] {
+        width  : 40px ;
+        height : 40px ;
+        border : 1px solid #dee2e6 ;
+        margin-right : 4px ;
+    }
+
+    [data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+    .bid-background-image-logo [data-bid-element='mgr_name'] {
+        font-size   : 1.2rem ;
+    }
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-btn-rightmodule .bid-cover-btnicon {
+    line-height : 1 ;
+    cursor  : pointer ;
+    display : flex ;
+    justify-content : center ;
+    align-items : center ;
+    cursor : pointer ;
+    width  : 46px ;
+    height : 46px ;
+    font-size : 20px ;
+    border-radius : 50% ;
+    border : 1px solid #b8bbbb;
+    background-color : #e1e1e1;
+    color : #1a3a3a ;
+    box-shadow : rgb(0 0 0 / 35%) 0px 2px 5px ;
+}
+
+
+
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-bgimage-leftmenu-goto-mypage {
+    /*-- Color --*/
+    background-color : rgba(24,39,55,0.6) ;
+    filter : drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161)) ;
+    color  : rgb(191,190,190) ;
+    border : 2px solid rgb(191,190,190) ;
+
+    /*-- Display --*/
+    display : flex ;
+    justify-content : center ;
+    align-items : center ;
+
+    /*-- Font --*/
+    font-size   : 1rem ;
+    line-height : 1 ;
+    font-weight : bold ;
+
+    /*-- Shape --*/
+    width  : 100px ;
+    height : 2.2rem ;
+    cursor : pointer ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-bgimage-leftmenu-goto-mypage:hover {
+    /*-- Color --*/
+    color  : rgb(180,255,233) ;
+    border : 2px solid rgb(180,255,233) ;
+}
+
+/*-- 프로젝트 이미지 안의 프로젝트 타이틀 --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-prjimage-prjtitle {
+    /* Font */
+    color  : rgb(191,190,190) ;
+    font-weight : 500  ;
+    font-size   : 17px ;
+    line-height : 1.2  ;
+    font-family: Noto Sans KR,sans-serif ;
+    word-break: break-all;
+    white-space: pre-wrap ;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp : 2 ;
+    -webkit-line-clamp : 2 ;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* Shape */
+    cursor:pointer;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-prjimage-prjtitle.active {
+    /* Font */
+    font-weight : 600  ;
+    color  : white ;
+}
+
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-callmodal] {
+    color : #808080 ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+[bid-callmodal]:hover {
+    color : #2B2B2B ;
+}
+
+
+/*-- tailer-link Style Sheet --*/
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link {
+    flex : 0 0 auto ;
+    background-color : transparent ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group {
+    border : 0px ;
+    background-color : transparent ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item {
+    border  : 0px  ;
+    padding : 0rem ;
+    background-color: transparent ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-header {
+    border : 0px ;
+    background-color : transparent ;
+    font-family : NanumSquare,sans-serif ;
+    font-size   : 0.95rem ;
+    color       : #ABABAB ;
+    line-height : 1.0 ;
+    padding     : 0rem 0rem 0.2rem 0.5rem ;
+    display     : flex   ;
+    align-items : center ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-handle {
+    flex      : 0 0 18px ;
+    height    : 30px ;
+    font-size : 14px ;
+    padding   : 8px 0px;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-info {
+    flex    : 1 1 auto ;
+    display : flex ;
+    align-items: center ;
+    border-top-left-radius    : 20px ;
+    border-bottom-left-radius : 20px ;
+    padding : 8px 0px 8px 0px ;
+    background-color : transparent ;
+    color : #919191 ;
+    font-weight : normal ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-info.active {
+    background-color: #F1F1F1;
+    color: #011429;
+    font-weight: bold;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-info-icon {
+    flex : 0 0 27px ;
+    line-height  : 1 ;
+    align-self   : center ;
+    padding-left : 5px ;
+    position : relative ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-info-title {
+    flex : 1 1 auto ;
+    line-height :  1 ;
+    align-self: center;
+    padding-left: 5px;
+    padding-right : 5px;
+    white-space   : normal ;
+    word-wrap  : break-word ;
+    word-break : break-all ;
+}
+
+[data-bid-module="class:cwinfo.wowideas:bs4.prjroot:side.treespace"]
+.bid-flexitem-tailer-link .bid-list-group-item-info-title {
+    flex : 0 0 auto ;
+    align-self: center;
+    padding-right: 10px;
+}
