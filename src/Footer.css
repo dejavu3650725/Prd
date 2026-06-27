@@ -1,37 +1,56 @@
 .app-footer {
-  margin-top: 40px;
-  padding: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
+  margin-top: auto;
   width: 100%;
+  padding: 30px 20px;
+  background: rgba(15, 23, 42, 0.85); /* 힙한 다크 슬레이트 느낌 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px; /* 세련된 둥근 모서리 */
+  text-align: center;
+  color: #e2e8f0;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .footer-links {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.8);
+  color: #e2e8f0;
   text-decoration: none;
-  transition: color 0.2s;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .footer-links a:hover {
-  color: #fff;
-  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .privacy-link {
-  font-weight: 600;
+  font-weight: 700;
+  color: #38bdf8 !important; /* 개인정보처리방침 강조 포인트 컬러 */
 }
 
 .footer-divider {
-  margin: 0 10px;
-  color: rgba(255, 255, 255, 0.3);
+  display: none; /* 올드한 바(|) 제거 */
 }
 
 .footer-info p {
   margin: 5px 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
 }

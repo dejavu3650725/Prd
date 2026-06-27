@@ -27,8 +27,8 @@ function Footer() {
         <a href="#" onClick={openPrivacy} className="privacy-link">개인정보처리방침</a>
       </div>
       <div className="footer-info">
-        <p>정보관리책임자: 금정민 (example@school.edu)</p>
-        <p>Copyright &copy; 2026 금정민. All rights reserved.</p>
+        <p>정보관리 책임자: 금정민(dejavu3650725@gmail.com)</p>
+        <p>저작권 2026 금정민. All rights reserved.</p>
       </div>
 
       <TermsModal 
